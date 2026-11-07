@@ -1,0 +1,9 @@
+.claude/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+*.pt
+*.pth
+*.bin
+.DS_Store
