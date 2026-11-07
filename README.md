@@ -4,7 +4,7 @@ Deadline: 2026-11-13 23:59 (NTULearn). Full plan: [项目实施方案.md](项目
 
 ## Layout
 ```text
-data/        train.json test.json (not in git; copy from course files)
+data/        train.json test.json (in git, only ~3 MB)
 splits/      val_idx.npy                 shared validation indices
 src/         common.py (A), tfidf_models.py, noise_exp.py (A),
              glove_bilstm.py (B), transformer_ft.py, ensemble.py (C)

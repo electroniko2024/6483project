@@ -8,7 +8,4 @@ __pycache__/
 *.bin
 .DS_Store
 
-# data and embeddings stay out of the repo (see plan section 2)
-data/*.json
-data/*.txt
 glove*
