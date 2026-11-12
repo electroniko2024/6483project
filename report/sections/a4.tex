@@ -1,3 +1,18 @@
-% Owner: member B. Placeholder created by A; replace with the section text.
+% Owner: member B.
 \subsection{(a)(4) Baseline choice and motivation}
-\tbd{member B}
+Word-level TF-IDF with logistic regression is a suitable baseline. It fits sparse
+review vectors efficiently, and coefficients show which features drive a prediction.
+Bigrams can capture local phrases such as \emph{not good}. Longer contexts,
+including a later clause that reverses an earlier opinion, remain difficult
+with local features. Exact term matching also gives limited coverage to unseen words.
+
+We evaluate two extensions using the same grouped split. First, averaging static
+GloVe vectors~\cite{pennington2014glove} gives a dense 300-dimensional representation
+with one vector per review. The logistic classifier then tests whether this
+representation preserves useful sentiment information. Second, a BiLSTM retains
+token order and learns forward and backward representations before pooling.
+The Transformer line evaluates contextual subword representations. Because the
+feature representation and classifier can both change between lines, the score
+differences describe the performance of each complete system.
+
+At threshold 0.5, the validation Macro-F1 scores are 0.8451 for TF-IDF + LR, 0.7623 for mean GloVe + LR, and 0.8524 for the three-seed BiLSTM. The sequence model improves on averaging in this experiment. Its score is 0.0072 higher than TF-IDF + LR on this fold. The comparison uses a single validation split.

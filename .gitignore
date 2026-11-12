@@ -8,7 +8,7 @@ __pycache__/
 *.bin
 .DS_Store
 
-glove*
+data/glove*
 
 # LaTeX build files
 report/*.aux

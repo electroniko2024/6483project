@@ -40,8 +40,8 @@ Model & Feature dim & Params & Acc@0.5 & Acc@$\tau_{acc}$ & Macro-F1@$\tau_{f1}$
 TF-IDF + LR            & 50{,}000 & 50{,}001  & 0.924 & 0.928 & 0.851 & 1.5 & 122 \\
 TF-IDF + LinearSVC     & 50{,}000 & 150{,}009$^{\dagger}$ & 0.929 & 0.930 & 0.857 & 2.8 & 150 \\
 TF-IDF + ComplementNB  & 10{,}000 & 20{,}000  & 0.910 & 0.926 & 0.857 & 1.2 & 155 \\
-Mean GloVe + LR        & 300      & 301       & \tbd{B} & \tbd{B} & \tbd{B} & \tbd{B} & \tbd{B} \\
-GloVe + BiLSTM         & 300/token & \tbd{B}  & \tbd{B} & \tbd{B} & \tbd{B} & \tbd{B} & \tbd{B} \\
+Mean GloVe + LR & 300 & 301 & 0.854 & 0.899 & 0.788 & 0.06 & 351 \\
+GloVe + BiLSTM & 300/token & 2{,}876{,}010 & 0.930 & 0.930 & 0.852 & 364.66 & 1112 \\
 RoBERTa-base           & 768/token & $\approx$125M & \tbd{C} & \tbd{C} & \tbd{C} & \tbd{C} & \tbd{C} \\
 \bottomrule
 \end{tabular}}\\[2pt]
@@ -88,7 +88,7 @@ This is exactly where order-aware and contextual features should help: negation,
 \paragraph{Across formats: resources.}
 Resource use grows much faster than accuracy.
 TF-IDF + LR trains in about 1.5\,s on a CPU with about 120\,MB peak memory, and predicts the 1{,}492 validation reviews in a few milliseconds.
-The GloVe line needs the pre-trained embedding file. The full \texttt{glove.6B.300d} table has 400k$\times$300 floats, and only the rows of our vocabulary are kept. The BiLSTM adds sequential computation that is \tbd{B: measured slowdown} slower than TF-IDF.
+The GloVe line needs the pre-trained embedding file. The full \texttt{glove.6B.300d} table has 400k$\times$300 floats, and only the rows of our vocabulary are kept. The BiLSTM fits take 121.6 s per seed on average (four PyTorch CPU threads). Its table row sums the three final training runs, excluding the hyperparameter sweep. Peak memory for the two GloVe models is process RSS. The GloVe and TF-IDF timings come from different CPUs.
 RoBERTa-base has about 125M parameters, roughly 2{,}500 times the TF-IDF+LR model. It needs a GPU for practical fine-tuning (\tbd{C: time, peak GPU memory}), and inference cost grows with the sequence length because of attention.
 Figure~\ref{fig:g-scatter} plots accuracy against training time on a log scale.
 

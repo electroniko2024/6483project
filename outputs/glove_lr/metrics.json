@@ -1,0 +1,95 @@
+{
+  "model": "Mean GloVe + Logistic Regression",
+  "feature": "GloVe 300d mean (dense)",
+  "seeds": [
+    42
+  ],
+  "val_acc@0.5": 0.853887399463807,
+  "val_macro_f1@0.5": 0.7623419173630048,
+  "val_neg_f1@0.5": 0.6148409893992933,
+  "val_auc": 0.9039577722408653,
+  "confusion@0.5": [
+    [
+      174,
+      44
+    ],
+    [
+      174,
+      1100
+    ]
+  ],
+  "thr_acc": 0.16,
+  "val_acc@thr_acc": 0.8994638069705094,
+  "val_macro_f1@thr_acc": 0.764213560564876,
+  "thr_f1": 0.39,
+  "val_macro_f1@thr_f1": 0.788439045780723,
+  "val_acc@thr_f1": 0.8840482573726541,
+  "seed_std_macro_f1": 0.0,
+  "n_params": 301,
+  "feature_dim": 300,
+  "train_time_s": 0.05595532600000297,
+  "infer_time_s": 0.0006944819999716856,
+  "peak_mem_mb": 351.05859375,
+  "hardware": "CPU: x86_64 (9 threads)",
+  "sparse": false,
+  "oov_rate": 0.0495203680150249,
+  "coverage": {
+    "vocab_size": 6798,
+    "covered_types": 6359,
+    "train": {
+      "tokens": 332341,
+      "vocab_oov_rate": 0.017807011473155585,
+      "glove_uncovered_rate": 0.036892829954775365
+    },
+    "val": {
+      "tokens": 84127,
+      "vocab_oov_rate": 0.031702069490175566,
+      "glove_uncovered_rate": 0.0495203680150249
+    },
+    "test": {
+      "tokens": 103067,
+      "vocab_oov_rate": 0.031232111150998866,
+      "glove_uncovered_rate": 0.04882261053489478
+    }
+  },
+  "selected_config": {
+    "C": 10.0,
+    "class_weight": "balanced"
+  },
+  "at_thr_acc": {
+    "thr": 0.16,
+    "acc": 0.8994638069705094,
+    "macro_f1": 0.764213560564876,
+    "neg_f1": 0.585635359116022,
+    "pos_f1": 0.9427917620137299,
+    "confusion": [
+      [
+        106,
+        112
+      ],
+      [
+        38,
+        1236
+      ]
+    ],
+    "auc": 0.9039577722408653
+  },
+  "at_thr_f1": {
+    "thr": 0.39,
+    "acc": 0.8840482573726541,
+    "macro_f1": 0.788439045780723,
+    "neg_f1": 0.6462167689161554,
+    "pos_f1": 0.9306613226452906,
+    "confusion": [
+      [
+        158,
+        60
+      ],
+      [
+        113,
+        1161
+      ]
+    ],
+    "auc": 0.9039577722408653
+  }
+}

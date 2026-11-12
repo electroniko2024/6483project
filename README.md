@@ -47,13 +47,23 @@ All commands are run from the project root.
 |---|---|---|---|
 | TF-IDF baselines (grid search with grouped 5-fold CV) | `python src/tfidf_models.py` | `outputs/tfidf_lr/`, `outputs/tfidf_svm/`, `outputs/tfidf_cnb/`, baseline `submission.csv` | ~6 min (10 parallel jobs); `--quick` <1 min |
 | Noise-label experiment, question (i) | `python src/noise_exp.py` | `outputs/noise_exp/` | a few minutes |
-| GloVe + BiLSTM (B) | TODO | `outputs/glove_lr/`, `outputs/bilstm/` | |
+| GloVe + BiLSTM (B) | `python src/glove_bilstm.py` | `outputs/glove_lr/`, `outputs/bilstm/` | |
 | RoBERTa fine-tuning (C) | TODO | `outputs/roberta/` | GPU |
 | Ensemble + final submission (C) | TODO | `submission.csv` | |
 | Resource vs accuracy, question (g) | `python src/resource_table.py` | `outputs/resource/` | seconds |
 | TF-IDF dimension study, question (g) | `python src/tfidf_dim_study.py` | `outputs/resource/tfidf_dim_study.*` | ~1 min |
 
 `python src/tfidf_models.py --quick` runs a reduced grid for a fast check.
+For member B, run `python src/glove_bilstm.py --model lr` for the lightweight baseline or
+`python src/glove_bilstm.py --model bilstm` for BiLSTM alone. The full run tunes
+BiLSTM sequentially and then averages probabilities from seeds 42, 43, and 44.
+It selects CUDA when available. For a shorter run use `--default-config` to
+skip tuning, and `--epochs` to cap training. Both models use the shared
+5,909-row training portion for fits and export positive probabilities
+in original row order. Coverage
+statistics are recorded in each model's `metrics.json`.
+The archived B runs used Python 3.12, PyTorch 2.6.0 CPU, NumPy 2.3.5,
+and scikit-learn 1.8.0. Timing excludes vocabulary and embedding preparation.
 
 ## Report
 `report/main.tex` (sections in `report/sections/`, one file per question; owner noted at the top of each file). Build with `latexmk -pdf main.tex` inside `report/` or upload the folder to Overleaf. Red `[TBD: ...]` marks text or numbers a member still has to supply.

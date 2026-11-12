@@ -1,2 +1,35 @@
-% Owner: member B. Placeholder created by A; replace with the section text.
-\tbd{member B}
+% Owner: member B.
+Hotel reviews share general cues such as \emph{excellent} and \emph{disappointing}
+with product reviews, so a frozen source classifier provides a useful starting
+point. The meaning of some features can change: \emph{small} can describe a
+convenient electronic device or an uncomfortably small room. Hotel reviews also
+discuss service, cleanliness and location, often with conflicting opinions in
+the same review. Changes in the distribution of topics or class prevalence can
+make the source-domain decision threshold poorly calibrated on hotel reviews.
+Prior work on review transfer provides evidence for these risks, but the
+magnitude of the loss on hotel reviews requires target-domain evaluation
+\cite{blitzer2007biographies,karouzos2021udalm}.
+
+\paragraph{Adaptation with raw hotel text.}
+One option is to continue masked-language-model training on unlabeled hotel
+reviews and then train the sentiment head on labeled product reviews. Another
+is to train the sentiment head on source labels while using the hotel corpus
+for a joint masked-language-model objective, as in UDALM~\cite{karouzos2021udalm}.
+A cheaper alternative is self-training: label an unlabeled hotel pool with the
+source model, retain only high-confidence examples from each predicted class,
+and retrain with the original labeled reviews and a lower weight on pseudo-labels.
+Confidence cutoffs should be conservative because domain shift can produce
+confident errors and reinforce class imbalance. For a lightweight linear
+model, structural correspondence learning can instead use frequent shared
+pivot words to connect product and hotel vocabulary~\cite{blitzer2007biographies}.
+
+\paragraph{Evaluation.}
+If manual annotation is feasible, independently label a random sample of
+approximately 100 hotel reviews using a fixed overall-polarity rubric.
+Adjudicate disagreements and document how mixed or neutral reviews are treated.
+Keep this set separate from the unlabeled adaptation pool. Compare the frozen
+source model and adapted models on the same labeled reviews using accuracy,
+Macro-F1 and negative-class F1. Any threshold chosen using hotel labels needs
+a separate calibration set or a nested validation protocol. Without target
+labels, inspect OOV rates and prediction distributions as diagnostics and
+leave target-domain accuracy unreported.
