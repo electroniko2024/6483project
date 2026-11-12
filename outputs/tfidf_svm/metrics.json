@@ -1,0 +1,50 @@
+{
+  "model": "TF-IDF + LinearSVC (sigmoid-calibrated)",
+  "feature": "TF-IDF word12_mindf1_max50k (sparse)",
+  "seeds": [
+    42
+  ],
+  "val_acc@0.5": 0.9289544235924933,
+  "val_macro_f1@0.5": 0.8476324805099213,
+  "val_neg_f1@0.5": 0.7363184079601991,
+  "val_auc": 0.9501965923984272,
+  "confusion@0.5": [
+    [
+      148,
+      70
+    ],
+    [
+      36,
+      1238
+    ]
+  ],
+  "thr_acc": 0.565,
+  "val_acc@thr_acc": 0.9296246648793566,
+  "val_macro_f1@thr_acc": 0.8542338343870814,
+  "thr_f1": 0.625,
+  "val_macro_f1@thr_f1": 0.8571201398681267,
+  "val_acc@thr_f1": 0.9269436997319035,
+  "seed_std_macro_f1": 0.0,
+  "n_params": 150009,
+  "feature_dim": 50000,
+  "train_time_s": 2.786,
+  "infer_time_s": 0.0035,
+  "peak_mem_mb": 150.1,
+  "hardware": "CPU: AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD (16 threads)",
+  "selected_config": {
+    "features": {
+      "min_df": 1,
+      "max_features": 50000,
+      "char": false
+    },
+    "classifier": {
+      "C": 1,
+      "class_weight": null
+    }
+  },
+  "cv_macro_f1_at_thr": 0.8536270569694588,
+  "cv_auc": 0.9532265169034246,
+  "sparse": true,
+  "test_model": "same config refit on all 7401 training rows; thresholds taken from the validation split",
+  "note": "deterministic; seed_std is 0 by construction"
+}

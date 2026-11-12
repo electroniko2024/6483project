@@ -45,7 +45,7 @@ All commands are run from the project root.
 
 | Step | Command | Output | Time (CPU) |
 |---|---|---|---|
-| TF-IDF baselines (grid search with grouped 5-fold CV) | `python src/tfidf_models.py` | `outputs/tfidf_lr/`, `outputs/tfidf_svm/`, `outputs/tfidf_cnb/`, baseline `submission.csv` | see below |
+| TF-IDF baselines (grid search with grouped 5-fold CV) | `python src/tfidf_models.py` | `outputs/tfidf_lr/`, `outputs/tfidf_svm/`, `outputs/tfidf_cnb/`, baseline `submission.csv` | ~6 min (10 parallel jobs); `--quick` <1 min |
 | Noise-label experiment, question (i) | `python src/noise_exp.py` | `outputs/noise_exp/` | a few minutes |
 | GloVe + BiLSTM (B) | TODO | `outputs/glove_lr/`, `outputs/bilstm/` | |
 | RoBERTa fine-tuning (C) | TODO | `outputs/roberta/` | GPU |

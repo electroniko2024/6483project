@@ -1,0 +1,49 @@
+{
+  "model": "TF-IDF + Complement Naive Bayes",
+  "feature": "TF-IDF word12_mindf1_max10k (sparse)",
+  "seeds": [
+    42
+  ],
+  "val_acc@0.5": 0.9101876675603218,
+  "val_macro_f1@0.5": 0.8385109222085446,
+  "val_neg_f1@0.5": 0.7309236947791166,
+  "val_auc": 0.9529474457390578,
+  "confusion@0.5": [
+    [
+      182,
+      36
+    ],
+    [
+      98,
+      1176
+    ]
+  ],
+  "thr_acc": 0.4,
+  "val_acc@thr_acc": 0.9262734584450402,
+  "val_macro_f1@thr_acc": 0.8571154951158781,
+  "thr_f1": 0.4,
+  "val_macro_f1@thr_f1": 0.8571154951158781,
+  "val_acc@thr_f1": 0.9262734584450402,
+  "seed_std_macro_f1": 0.0,
+  "n_params": 20000,
+  "feature_dim": 10000,
+  "train_time_s": 1.152,
+  "infer_time_s": 0.0035,
+  "peak_mem_mb": 155.0,
+  "hardware": "CPU: AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD (16 threads)",
+  "selected_config": {
+    "features": {
+      "min_df": 1,
+      "max_features": 10000,
+      "char": false
+    },
+    "classifier": {
+      "alpha": 0.1
+    }
+  },
+  "cv_macro_f1_at_thr": 0.8429855016506305,
+  "cv_auc": 0.9505164170612634,
+  "sparse": true,
+  "test_model": "same config refit on all 7401 training rows; thresholds taken from the validation split",
+  "note": "deterministic; seed_std is 0 by construction"
+}
