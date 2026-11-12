@@ -51,5 +51,9 @@ All commands are run from the project root.
 | RoBERTa fine-tuning (C) | TODO | `outputs/roberta/` | GPU |
 | Ensemble + final submission (C) | TODO | `submission.csv` | |
 | Resource vs accuracy, question (g) | `python src/resource_table.py` | `outputs/resource/` | seconds |
+| TF-IDF dimension study, question (g) | `python src/tfidf_dim_study.py` | `outputs/resource/tfidf_dim_study.*` | ~1 min |
 
 `python src/tfidf_models.py --quick` runs a reduced grid for a fast check.
+
+## Report
+`report/main.tex` (sections in `report/sections/`, one file per question; owner noted at the top of each file). Build with `latexmk -pdf main.tex` inside `report/` or upload the folder to Overleaf. Red `[TBD: ...]` marks text or numbers a member still has to supply.

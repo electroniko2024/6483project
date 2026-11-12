@@ -1,0 +1,101 @@
+% Owner: member A (integration). The GloVe paragraph is drafted from the
+% agreed plan and must be checked by B; the RoBERTa paragraph by C.
+
+\paragraph{Choice of feature format.}
+We compare three feature formats of increasing cost, one per model line, so that (g) can measure the trade-off directly:
+\begin{enumerate}
+  \item \textbf{Sparse bag-of-n-grams with TF-IDF weighting}, used by linear classifiers;
+  \item \textbf{static pre-trained word embeddings} (300-dimensional GloVe~\cite{pennington2014glove}), used by an averaged-embedding classifier and by a BiLSTM;
+  \item \textbf{subword tokens fed to a pre-trained Transformer} (RoBERTa-base~\cite{liu2019roberta}), whose contextual representation is fine-tuned end-to-end. This is the format of our final model.
+\end{enumerate}
+Figure~\ref{fig:b-pipeline} summarises the pipeline. All three formats share the loading, auditing, splitting and cleaning steps described below.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=4mm and 6mm,
+  box/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=8mm, text width=27mm, fill=gray!8},
+  fbox/.style={box, text width=36mm, fill=blue!6},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[box] (load) {Load \texttt{train.json}\\(7{,}401) / \texttt{test.json} (1{,}851)};
+\node[box, right=of load] (audit) {Audit: imbalance,\\lengths, duplicates};
+\node[box, right=of audit] (split) {Grouped stratified split\\5{,}909 train / 1{,}492 val};
+\node[box, right=of split] (clean) {Light cleaning\\(HTML, whitespace)};
+\node[fbox, below=9mm of audit, xshift=-6mm] (tfidf) {\textbf{TF-IDF}: lowercase, word 1--2-grams (+ char 2--5-grams), sublinear tf, L2 $\rightarrow$ sparse $x\in\mathbb{R}^{50\text{k}}$};
+\node[fbox, right=of tfidf] (glove) {\textbf{GloVe}: lowercase tokens $\rightarrow$ vocabulary ids $\rightarrow$ 300-d vectors (mean or sequence, $L\le256$)};
+\node[fbox, right=of glove] (bpe) {\textbf{RoBERTa}: cased byte-level BPE $\rightarrow$ ids + mask, $L\le256$};
+\draw[arr] (load) -- (audit);
+\draw[arr] (audit) -- (split);
+\draw[arr] (split) -- (clean);
+\draw[arr] (clean.south) |- ++(0,-4mm) -| (tfidf.north);
+\draw[arr] (clean.south) |- ++(0,-4mm) -| (glove.north);
+\draw[arr] (clean.south) -- ++(0,-4mm) -| (bpe.north);
+\end{tikzpicture}
+\caption{Data preprocessing pipeline. Every vectoriser, vocabulary and model is fitted on the training part only; the validation split is used only for model selection and the test set only for the final predictions.}
+\label{fig:b-pipeline}
+\end{figure}
+
+\paragraph{1. Loading and auditing.}
+Both files are read with \texttt{pandas.read\_json}.
+The training set has 7{,}401 reviews with a binary label (6{,}319 positive, 1{,}082 negative). The test set has 1{,}851 unlabelled reviews. No review is missing or empty.
+Review length varies widely: the median is 42 words, 75\% of reviews have at most 70 words, 97\% at most 178, and the longest has 1{,}066 words.
+We also checked for duplicates, comparing texts after lower-casing and collapsing whitespace:
+\begin{itemize}
+  \item 154 distinct texts occur more than once in the training set, covering 373 rows, and every copy of a text has the same label;
+  \item 101 test reviews are identical to a training review;
+  \item 21 test reviews duplicate another test review.
+\end{itemize}
+
+\paragraph{2. Grouped, stratified validation split.}
+Every model is tuned on one shared validation split.
+If duplicates were split at random, copies of the same review would land on both sides, and the validation score would partly measure memorisation.
+We therefore group rows by their normalised text and take fold~0 of a 5-fold \texttt{StratifiedGroupKFold} (seed 42).
+This yields 5{,}909 training and 1{,}492 validation reviews. The validation set contains 218 negatives (14.6\%, the same ratio as the full set), and no text appears on both sides.
+Cross-validation inside the training part, including the internal folds used to calibrate the SVM, uses the same grouping.
+The test set is used only to produce \texttt{submission.csv}.
+
+\paragraph{3. Light text cleaning.}
+We unescape HTML entities, collapse runs of whitespace and strip leading and trailing spaces.
+We deliberately do \emph{not}:
+\begin{itemize}
+  \item remove stop words, because standard stop lists contain ``not'', ``no'' and ``but'', which carry sentiment;
+  \item stem, or strip punctuation such as ``!'' and ``?''.
+\end{itemize}
+Text is lower-cased for TF-IDF and GloVe, and kept in its original case for RoBERTa, whose tokenizer is case-sensitive.
+
+\paragraph{4a. TF-IDF features (L1).}
+The text is tokenised with a pattern that keeps single-character tokens (e.g.\ the ``t'' of ``don't'') as well as ``!'' and ``?''.
+We extract unigrams and bigrams; bigrams capture short negations such as ``not good'' and ``not worth''.
+Each term $t$ in review $d$ is weighted with sublinear term frequency and smoothed inverse document frequency~\cite{salton1988term},
+\begin{equation}
+  w_{t,d} = \bigl(1 + \log \mathrm{tf}_{t,d}\bigr)\cdot\Bigl(\log\frac{1+N}{1+\mathrm{df}_t} + 1\Bigr),
+\end{equation}
+where $N$ is the number of training reviews and $\mathrm{df}_t$ the number of reviews containing $t$. Each review vector is then L2-normalised.
+The vectoriser is fitted on the training rows only.
+Three settings were tuned by grouped 5-fold cross-validation:
+\begin{itemize}
+  \item the minimum document frequency (1, 2 or 3);
+  \item the vocabulary cap (10k, 30k, 50k or unlimited);
+  \item whether to append character 2--5-grams, which can absorb misspellings.
+\end{itemize}
+The selected representation has 50{,}000 word 1--2-gram features. It is very sparse: 86 non-zeros per review on average, a density of 0.17\%.
+
+\paragraph{4b. Static word embeddings (L2).}
+\tbd{B: please check and adjust this paragraph.}
+Reviews are lower-cased and tokenised into words. The vocabulary is built on the training part (minimum frequency~2) plus \texttt{<pad>} and \texttt{<unk>} tokens.
+Each token is mapped to its 300-dimensional \texttt{glove.6B} vector~\cite{pennington2014glove}, pre-trained on 6 billion tokens of Wikipedia and Gigaword.
+Words without a GloVe vector are \tbd{randomly initialised / mapped to \texttt{<unk>}}. Their share of validation tokens is \tbd{OOV rate}.
+For the averaged-embedding classifier, a review is the mean of its token vectors, a dense $\mathbb{R}^{300}$ input.
+For the BiLSTM, a review is a sequence of token ids truncated to 256 tokens and padded only to the longest review in each mini-batch.
+
+\paragraph{4c. Subword tokens for a pre-trained Transformer (L3).}
+\tbd{C: please check and adjust this paragraph.}
+Reviews keep their original casing and are tokenised with RoBERTa's byte-level BPE tokenizer~\cite{sennrich2016neural,liu2019roberta}, which has a vocabulary of 50{,}265 subwords. Every string can be encoded, so there are no out-of-vocabulary words.
+The sequence is wrapped in \texttt{<s>}\,\dots\,\texttt{</s>} and truncated to 256 subword tokens, keeping the beginning of the review; this affects only about 3\% of reviews.
+Mini-batches are padded dynamically, and an attention mask marks the real tokens.
+The model learns the features itself: each token receives a 768-dimensional contextual vector, and the \texttt{<s>} vector feeds the classifier (see (c)).
+
+\paragraph{5. Labels and class imbalance.}
+Labels are used as given (0 = negative, 1 = positive).
+Each model outputs $P(y{=}1\mid x)$. We report metrics at threshold~0.5 and at thresholds tuned on the validation split: one maximising accuracy (\texttt{thr\_acc}, used for the submission) and one maximising Macro-F1 (\texttt{thr\_f1}).
+Class-weighted losses were tried as a hyper-parameter in every model line, as described in (d).

@@ -1,0 +1,91 @@
+% EE6483 Mini Project (Option 1) report. Master file, integrated by member A.
+% Each section lives in sections/<id>.tex; the owner of each file is noted at
+% its top. Compile: latexmk -pdf main.tex  (or upload the report/ folder to Overleaf)
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\graphicspath{{figures/}}
+\setlist{itemsep=2pt,topsep=3pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+% \tbd{...}: placeholder for numbers/text another member still has to supply.
+\newcommand{\tbd}[1]{\textcolor{red}{[TBD: #1]}}
+
+\title{EE6483 Artificial Intelligence and Data Mining\\Mini Project (Option 1): Sentiments of Product Reviews}
+\author{Group \tbd{group no.}}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Group members and contributions}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{l l Y}
+\toprule
+Member & Matric no. & Contribution \\
+\midrule
+A: \tbd{name} & \tbd{} & Shared code (\texttt{common.py}, data split, evaluation), TF-IDF baselines, noisy-label experiment, resource/accuracy analysis; report (a)(1), (b), (g), (i); report integration. \\
+B: \tbd{name} & \tbd{} & GloVe features, averaged-GloVe + LR, BiLSTM model and tuning; report (a)(2), (a)(4), (d), (h). \\
+C: \tbd{name} & \tbd{} & RoBERTa fine-tuning, ensemble and final submission, error analysis; report (a)(3), (c), (e), (f); README. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+All members contributed papers to the literature table in (a)(2) and cross-reviewed each other's sections.
+
+\tableofcontents
+\newpage
+
+\section{(a) Literature survey}
+\input{sections/a1}
+\input{sections/a2}
+\input{sections/a3}
+\input{sections/a4}
+
+\section{(b) Feature format and data preprocessing}
+\input{sections/b}
+
+\section{(c) Model}
+\input{sections/c}
+
+\section{(d) Parameter selection}
+\input{sections/d}
+
+\section{(e) Test-set results}
+\input{sections/e}
+
+\section{(f) Analysis of correctly and incorrectly classified samples}
+\input{sections/f}
+
+\section{(g) Effect of the feature format on resources and accuracy}
+\input{sections/g}
+
+\section{(h) Hotel reviews without rating scores}
+\input{sections/h}
+
+\section{(i) Hotel reviews with noisy rating scores}
+\input{sections/i}
+
+\appendix
+\section{Code and instructions}
+The code is in the \texttt{src/} folder of the submitted archive; \texttt{README.md}
+lists the commands to reproduce every result. \tbd{C: final README summary}
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+\end{document}

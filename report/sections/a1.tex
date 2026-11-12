@@ -1,0 +1,90 @@
+% Owner: member A.
+\subsection{(a)(1) Problem definition, challenges and solution types}
+
+\paragraph{Problem definition.}
+Sentiment analysis, also called opinion mining, is the computational study of the opinions, sentiments and emotions that people express in text~\cite{pang2008opinion,liu2012sentiment}.
+Liu~\cite{liu2012sentiment} formalises an opinion as a quintuple $(e, a, s, h, t)$: an entity $e$, one of its aspects $a$, the sentiment $s$ towards that aspect, the opinion holder $h$ and the time $t$.
+This project is the simplest instance of that definition: \emph{document-level binary polarity classification}.
+The entity is the purchased product and the holder is the reviewer, both implicit, and each review receives one label for the whole document.
+Given a review $x$, we learn a classifier $f(x) \approx P(y{=}1 \mid x)$, where $y=1$ is positive and $y=0$ is negative, and predict $\hat y = \mathbb{1}[f(x) \ge \tau]$ for a decision threshold $\tau$.
+Neutral or irrelevant reviews are not modelled.
+
+\paragraph{Granularity.}
+Sentiment can be analysed at three levels of granularity:
+\begin{itemize}
+  \item \emph{Document level}: one label per review, as in this project~\cite{pang2002thumbs}.
+  \item \emph{Sentence level}: usually a subjectivity filter followed by polarity classification.
+  \item \emph{Aspect level}: aspect-based sentiment analysis (ABSA) extracts aspects such as ``fit'' or ``fabric'' and assigns a polarity to each~\cite{hu2004mining,pontiki2014semeval}.
+\end{itemize}
+Related tasks use finer label sets, such as the five-point scale of the Stanford Sentiment Treebank~\cite{socher2013recursive}, or emotion categories.
+
+\paragraph{Challenges.}
+The main difficulties, each illustrated with what we observe in our data:
+\begin{enumerate}
+  \item \textbf{Negation and contrast.} Words such as ``not'', ``never'' and ``but'' change the polarity of the words around them. In ``Not bad for just a shirt'' (from our test set), ``bad'' signals a negative review, yet the review is mildly positive. A bag-of-words model loses the word order needed to resolve this.
+  \item \textbf{Implicit sentiment, sarcasm and irony.} Many reviews contain no explicit opinion word (``the seam came apart after one wash''), or say the opposite of what they mean.
+  \item \textbf{Mixed polarity.} A review may praise one aspect and criticise another. The document label then depends on which aspect the reviewer weighs more.
+  \item \textbf{Domain dependence.} The polarity of a word depends on the domain. ``Small'' is negative for a hotel room and often positive for a phone, and ``unpredictable'' is positive for a film plot but negative for a car's steering. Classifiers trained on one product category therefore degrade on another~\cite{turney2002thumbs,blitzer2007biographies}.
+  \item \textbf{Class imbalance.} Product reviews are mostly positive: 85.4\% of our training reviews are positive and 14.6\% negative. Predicting ``positive'' for every review already gives 85.4\% accuracy, so we report Macro-F1 and the F1 of the negative class alongside accuracy.
+  \item \textbf{Noisy and informal text.} Reviews contain typos, slang, emoticons and very different lengths. Our training reviews have a median of 42 words, but the longest has 1{,}066. When star ratings are used as labels, some labels disagree with the text, which is the problem studied in (i).
+\end{enumerate}
+
+\paragraph{Solution types under different settings.}
+Table~\ref{tab:a1-settings} organises common approaches along the three axes named in the assignment.
+
+\emph{Supervised versus unsupervised.}
+Supervised methods learn from labelled reviews. They range from Naive Bayes, maximum-entropy and SVM classifiers on bag-of-words features~\cite{pang2002thumbs}, and their strong NB-SVM variant~\cite{wang2012baselines}, through convolutional and recurrent networks over word embeddings~\cite{kim2014convolutional,socher2013recursive,zhang2018deep}, to fine-tuning pre-trained Transformers such as BERT and RoBERTa~\cite{devlin2019bert,liu2019roberta}.
+Unsupervised, lexicon-based methods need no labels:
+\begin{itemize}
+  \item scoring phrases by their association with seed words such as ``excellent'' and ``poor''~\cite{turney2002thumbs};
+  \item looking words up in a sentiment lexicon such as SentiWordNet~\cite{baccianella2010sentiwordnet};
+  \item rule-based scoring with VADER~\cite{hutto2014vader}.
+\end{itemize}
+They transfer easily across domains but are usually less accurate than supervised models.
+Between the two extremes lie weakly supervised methods. Distant supervision uses emoticons or star ratings as noisy labels~\cite{go2009twitter}, and semi-supervised methods use self-training on unlabelled reviews. Zero-shot and few-shot prompting of large language models is competitive on simple binary polarity, but still falls behind fine-tuned models on fine-grained and structured sentiment tasks~\cite{zhang2023sentiment}.
+
+\emph{Closed-set versus open-set.}
+In the closed-set setting every test review belongs to one of the training classes, here positive or negative.
+In the open-set setting, test inputs may come from classes never seen in training: neutral reviews, spam, text that is not a review, or another language.
+A closed-set classifier still forces each of these into ``positive'' or ``negative''.
+Open-set methods add a rejection option. DOC replaces the softmax with one-vs-rest sigmoids and rejects an input when no class is confident enough~\cite{shu2017doc}. Confidence-based detection flags inputs whose maximum softmax probability is low~\cite{hendrycks2017baseline}.
+
+\emph{Without versus with domain shift.}
+When training and test data come from the same distribution, standard supervised learning applies.
+Under domain shift, labelled data from a source domain (e.g.\ books) must serve an unlabelled target domain (e.g.\ kitchen appliances). Approaches include:
+\begin{itemize}
+  \item structural correspondence learning, which aligns domain-specific words through shared ``pivot'' features~\cite{blitzer2007biographies};
+  \item stacked denoising autoencoders that learn domain-invariant representations~\cite{glorot2011domain};
+  \item domain-adversarial training (DANN)~\cite{ganin2016domain};
+  \item continued pre-training of the language model on target-domain text~\cite{gururangan2020dont}.
+\end{itemize}
+These methods are the basis of our answer to (h).
+
+\begin{table}[t]
+\centering
+\caption{Solution types for sentiment classification under different settings. Our project is marked with $\star$.}
+\label{tab:a1-settings}
+\small
+\begin{tabularx}{\textwidth}{l Y Y}
+\toprule
+Setting & Typical methods & Strengths / limitations \\
+\midrule
+Supervised $\star$ & BoW + NB/LR/SVM~\cite{pang2002thumbs,wang2012baselines}; CNN/RNN over embeddings~\cite{kim2014convolutional,socher2013recursive}; fine-tuned Transformers~\cite{devlin2019bert,liu2019roberta} & Most accurate when labelled in-domain data exist; needs labels and is domain-specific. \\
+Unsupervised & Seed-word association~\cite{turney2002thumbs}; lexicons~\cite{baccianella2010sentiwordnet}; rules (VADER)~\cite{hutto2014vader} & No labels needed and interpretable; misses context, domain-specific terms and sarcasm. \\
+Weak / semi-supervised & Distant labels from emoticons or ratings~\cite{go2009twitter}; self-training; LLM prompting~\cite{zhang2023sentiment} & Cheap labels at scale; labels are noisy (see (i)). \\
+\midrule
+Closed-set $\star$ & Softmax over a fixed label set & Simple; inputs from unseen classes are forced into a known class. \\
+Open-set & One-vs-rest rejection (DOC)~\cite{shu2017doc}; confidence thresholds~\cite{hendrycks2017baseline} & Can reject neutral or irrelevant inputs; needs extra thresholds. \\
+\midrule
+No domain shift $\star$ & Standard train/validation/test protocol & Validation accuracy predicts test accuracy. \\
+Domain shift & SCL pivots~\cite{blitzer2007biographies}; denoising autoencoders~\cite{glorot2011domain}; DANN~\cite{ganin2016domain}; domain-adaptive pre-training~\cite{gururangan2020dont} & Uses unlabelled target text; gains depend on how far apart the domains are. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Our setting.}
+The project is \emph{supervised, closed-set and in-domain}.
+Training and test reviews come from the same product-review distribution; 101 of the 1{,}851 test reviews even appear verbatim in the training set.
+The data are imbalanced, and the labels may contain some noise.
+We therefore build supervised classifiers. A TF-IDF linear model serves as the baseline, and sequence models and pre-trained language models serve as improvements; (a)(4) motivates this choice.
+We use threshold tuning and Macro-F1 to handle the imbalance.
