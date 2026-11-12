@@ -102,7 +102,7 @@ Figure~\ref{fig:g-scatter} plots accuracy against training time on a log scale.
 \paragraph{Practical implications.}
 \begin{itemize}
   \item \textbf{Small labelled data favours pre-trained features.} With only 5.9k training reviews, TF-IDF must learn every n-gram's polarity from scratch, and 24\% of the word types in the validation reviews never occur in training. Pre-trained embeddings, and above all pre-trained language models, bring knowledge learned from billions of words, so they generalise better to rare words, typos and paraphrases.
-  \item \textbf{Large data or tight budgets favour sparse features.} TF-IDF scales linearly, runs on any CPU and is fully interpretable. It is the right choice when latency, cost or explainability matter more than the last percentage point, and it is a strong baseline~\cite{wang2012baselines}.
+  \item \textbf{Large data or tight budgets favour sparse features.} TF-IDF scales linearly, runs on any CPU and is fully interpretable. It is the right choice when latency, cost or explainability matter more than the last percentage point, and it is a strong baseline.
   \item \textbf{Robustness to domain change differs.} TF-IDF and GloVe fix their vocabulary at training time. A subword model covers any input string, which matters for the hotel-review scenario in (h).
 \end{itemize}
 In short, for this task the feature format moves accuracy by a few points but cost by orders of magnitude. The choice should therefore follow the accuracy target and the available hardware.

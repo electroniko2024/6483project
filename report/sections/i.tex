@@ -6,16 +6,16 @@ Training labels derived from the ratings are therefore \emph{noisy}.
 \subsection*{How our classifier would be affected}
 
 \paragraph{Sources and types of noise.}
-Rating errors on review sites are rarely uniform~\cite{frenay2014classification,song2023learning}. Three kinds can be distinguished:
+Rating errors on review sites are rarely uniform~\cite{song2023learning}. Three kinds can be distinguished:
 \begin{itemize}
   \item \emph{Random errors}, such as mis-clicks or swapped scales, are roughly \emph{symmetric}.
-  \item \emph{Systematic errors} are \emph{class-conditional}~\cite{natarajan2013learning}. A guest may write a positive text but give a low score because of the price or a single incident, or a hotel may receive inflated scores. Noise then runs mainly in one direction.
+  \item \emph{Systematic errors} are \emph{class-conditional}. A guest may write a positive text but give a low score because of the price or a single incident, or a hotel may receive inflated scores. Noise then runs mainly in one direction.
   \item \emph{Instance-dependent errors} concentrate on ambiguous, mixed or sarcastic reviews, which are exactly the hard cases.
 \end{itemize}
 
 \paragraph{Effect on training.}
 A discriminative classifier fits the labels it is given.
-Over-parameterised neural networks can memorise even completely random labels~\cite{zhang2017understanding}. They do tend to learn the clean, dominant patterns first and only later fit the noise~\cite{arpit2017closer}.
+Over-parameterised neural networks can memorise even completely random labels. They do tend to learn the clean, dominant patterns first and only later fit the noise.
 So a fine-tuned RoBERTa or a BiLSTM trained to convergence on noisy ratings would gradually absorb the errors, and its decision boundary and confidence estimates would suffer. Early stopping on clean data delays this but does not prevent it.
 A regularised linear TF-IDF model cannot memorise as freely, but its weights are biased in the same way.
 Class imbalance amplifies the damage. With an 85:15 class ratio, flipping each label independently with probability 20\% means only 41\% of the reviews labelled ``negative'' are truly negative, because flipped positives outnumber the real negatives.
@@ -85,17 +85,18 @@ Table~\ref{tab:i-noise} and Figure~\ref{fig:i-noise} lead to five observations.
 These results come from synthetic noise, a linear model and a single validation split. They show the size of the problem and the relative behaviour of the strategy families, not the gains to expect on real hotel ratings.
 
 \subsection*{Three approaches to improve the algorithm}
+The three families below follow the taxonomy of the recent survey by Song et al.~\cite{song2023learning}, where the individual methods named here are reviewed in detail.
 \begin{enumerate}
-  \item \textbf{Noise-robust losses and loss correction.} Replace plain cross-entropy with a loss that penalises confidently wrong labels less. Options include generalized cross-entropy, which interpolates between cross-entropy and the noise-tolerant MAE~\cite{zhang2018generalized}; symmetric cross-entropy~\cite{wang2019symmetric}; and label smoothing~\cite{szegedy2016rethinking,lukasik2020does}.
-  When the noise is class-conditional, as with positive texts given low scores, one can instead estimate the $2\times2$ noise-transition matrix $T$ and correct the loss through it (forward/backward correction~\cite{patrini2017making,natarajan2013learning}). $T$ can be estimated from a small clean subset.
+  \item \textbf{Noise-robust losses and loss correction.} Replace plain cross-entropy with a loss that penalises confidently wrong labels less. Options include generalized cross-entropy, which interpolates between cross-entropy and the noise-tolerant MAE; symmetric cross-entropy; and label smoothing.
+  When the noise is class-conditional, as with positive texts given low scores, one can instead estimate the $2\times2$ noise-transition matrix $T$ and correct the loss through it (forward/backward correction). $T$ can be estimated from a small clean subset.
   These methods change only the loss function of our RoBERTa fine-tuning, and add no extra cost.
 
   \item \textbf{Sample selection and data cleaning.} Exploit the fact that networks fit clean samples first, so small-loss samples are more likely to be correctly labelled.
-  Co-teaching trains two networks and lets each one update on the small-loss samples chosen by the other~\cite{han2018coteaching}. Confident Learning estimates the joint distribution of noisy and true labels from out-of-fold probabilities, then prunes or ranks the suspicious samples~\cite{northcutt2021confident}; this is our M1, the best method in our experiment.
+  Co-teaching trains two networks and lets each one update on the small-loss samples chosen by the other. Confident Learning estimates the joint distribution of noisy and true labels from out-of-fold probabilities, then prunes or ranks the suspicious samples~\cite{northcutt2021confident}; this is our M1, the best method in our experiment.
   Flagged reviews can also be sent to annotators instead of being discarded.
 
   \item \textbf{Label correction and semi-supervised learning.} Instead of discarding suspicious samples, correct or down-weight them. Our M2 and M3 are simple versions.
-  DivideMix fits a two-component mixture model to the per-sample losses to separate likely-clean from likely-noisy reviews. It then treats the noisy ones as \emph{unlabelled} data and trains on both parts with MixMatch-style semi-supervised learning~\cite{li2020dividemix}.
+  DivideMix fits a two-component mixture model to the per-sample losses to separate likely-clean from likely-noisy reviews. It then treats the noisy ones as \emph{unlabelled} data and trains on both parts with MixMatch-style semi-supervised learning.
   For hotel reviews, the text itself is a second, independent signal. A zero-shot model, for example our RoBERTa classifier or an LLM, can check each rating against its text, and the two can be combined into a corrected label.
 \end{enumerate}
 
