@@ -1,0 +1,111 @@
+{
+  "model": "GloVe + BiLSTM",
+  "feature": "GloVe 300d sequence (dense)",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "val_acc@0.5": 0.9302949061662198,
+  "val_macro_f1@0.5": 0.8523626842041164,
+  "val_neg_f1@0.5": 0.7450980392156863,
+  "val_auc": 0.9469668601385508,
+  "confusion@0.5": [
+    [
+      152,
+      66
+    ],
+    [
+      38,
+      1236
+    ]
+  ],
+  "thr_acc": 0.5,
+  "val_acc@thr_acc": 0.9302949061662198,
+  "val_macro_f1@thr_acc": 0.8523626842041164,
+  "thr_f1": 0.5,
+  "val_macro_f1@thr_f1": 0.8523626842041164,
+  "val_acc@thr_f1": 0.9302949061662198,
+  "seed_std_macro_f1": 0.004991737266541492,
+  "n_params": 2876010,
+  "feature_dim": 300,
+  "train_time_s": 364.65561709600024,
+  "infer_time_s": 13.721611018999738,
+  "peak_mem_mb": 1112.35546875,
+  "hardware": "CPU: x86_64 (9 threads)",
+  "sparse": false,
+  "oov_rate": 0.0495203680150249,
+  "seed_mean_macro_f1": 0.8382982293619142,
+  "per_seed_macro_f1": [
+    0.8399164431362309,
+    0.8315383074429532,
+    0.8434399375065583
+  ],
+  "coverage": {
+    "vocab_size": 6798,
+    "covered_types": 6359,
+    "train": {
+      "tokens": 332341,
+      "vocab_oov_rate": 0.017807011473155585,
+      "glove_uncovered_rate": 0.036892829954775365
+    },
+    "val": {
+      "tokens": 84127,
+      "vocab_oov_rate": 0.031702069490175566,
+      "glove_uncovered_rate": 0.0495203680150249
+    },
+    "test": {
+      "tokens": 103067,
+      "vocab_oov_rate": 0.031232111150998866,
+      "glove_uncovered_rate": 0.04882261053489478
+    }
+  },
+  "trainable_params": 2876010,
+  "device": "cpu",
+  "mean_single_seed_train_time_s": 121.55187236533341,
+  "mean_single_seed_infer_time_s": 4.57387033966658,
+  "train_time_note": "sum across final seeds; excludes tuning and preprocessing",
+  "selected_config": {
+    "lr": 0.001,
+    "hidden": 128,
+    "dropout": 0.3,
+    "freeze": false,
+    "weighted": false
+  },
+  "at_thr_acc": {
+    "thr": 0.5,
+    "acc": 0.9302949061662198,
+    "macro_f1": 0.8523626842041164,
+    "neg_f1": 0.7450980392156863,
+    "pos_f1": 0.9596273291925466,
+    "confusion": [
+      [
+        152,
+        66
+      ],
+      [
+        38,
+        1236
+      ]
+    ],
+    "auc": 0.9469668601385508
+  },
+  "at_thr_f1": {
+    "thr": 0.5,
+    "acc": 0.9302949061662198,
+    "macro_f1": 0.8523626842041164,
+    "neg_f1": 0.7450980392156863,
+    "pos_f1": 0.9596273291925466,
+    "confusion": [
+      [
+        152,
+        66
+      ],
+      [
+        38,
+        1236
+      ]
+    ],
+    "auc": 0.9469668601385508
+  }
+}

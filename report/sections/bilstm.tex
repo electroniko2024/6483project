@@ -1,0 +1,37 @@
+% Member B's model subsection. Member C can include this with \input{sections/bilstm}.
+\subsection{Static embeddings and bidirectional sequence classification}
+The mean-embedding classifier averages the covered token vectors in a review,
+using a zero vector if no token has a pretrained vector. The resulting 300
+features feed a regularised logistic regression classifier.
+For the sequence model, the same training vocabulary initialises an embedding
+matrix of size $V\times300$. Entries without pretrained vectors are initialised
+from a zero-mean Gaussian with standard deviation 0.05, and the padding row is
+fixed at zero. The input is a batch of integer token IDs $[B,L]$ with $L\le256$.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[node distance=3mm,
+  modelblock/.style={draw,rounded corners,align=center,text width=.69\linewidth,inner sep=5pt}]
+\node[modelblock] (tokens) {Token IDs $[B,L]$};
+\node[modelblock,below=of tokens] (embed) {GloVe-initialised embedding $[B,L,300]$};
+\node[modelblock,below=of embed] (recur) {Two bidirectional LSTM layers $[B,L,2H]$};
+\node[modelblock,below=of recur] (pool) {Masked max and mean pooling, concatenated $[B,4H]$};
+\node[modelblock,below=of pool] (out) {Dropout and linear classifier $[B,2]$};
+\draw[-{Latex}] (tokens) -- (embed);
+\draw[-{Latex}] (embed) -- (recur);
+\draw[-{Latex}] (recur) -- (pool);
+\draw[-{Latex}] (pool) -- (out);
+\end{tikzpicture}
+\caption{GloVe-initialised BiLSTM. $H$ denotes the hidden width per direction.}
+\label{fig:bilstm}
+\end{figure}
+
+In each layer, the backward direction reverses only the valid prefix. The valid states in
+both directions depend only on real tokens. Masked max pooling
+keeps the strongest activation per channel and masked mean pooling summarises
+the valid states. The classifier receives $4H$ features (512 at $H=128$).
+Training uses cross-entropy on the two logits and Adam. For the weighted variant,
+the loss weight for class $j$ is $n/(2n_j)$, using training counts only.
+The best epoch is selected by validation Macro-F1 at 0.5. Softmax provides the
+positive probability; final validation and test probabilities are averaged
+over seeds 42, 43 and 44.

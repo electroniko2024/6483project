@@ -1,2 +1,44 @@
-% Owner: member B. Placeholder created by A; replace with the section text.
-\tbd{member B}
+% Owner: member B. C supplies the final Transformer tuning values.
+\paragraph{Sparse baseline.}
+The sparse models use grouped five-fold cross-validation within the 5,909
+training reviews. The TF-IDF grid covers minimum document frequency, a
+vocabulary cap and optional character features. These control the trade-off
+between coverage of rare expressions and the number of features. Logistic
+regression uses $C=10$ and balanced class weights with 50,000 word unigram and
+bigram features. The calibrated LinearSVC selects $C=1$ without class weights,
+and ComplementNB selects $\alpha=0.1$ with 10,000 features.
+
+\paragraph{Static embedding models.}
+For mean GloVe, we compare $C\in\{0.1,1,10\}$ with and without balanced class
+weights. At the common threshold of 0.5, the $C=10$ balanced setting has the
+highest Macro-F1 (0.7623). Its unweighted counterpart scores 0.7598 Macro-F1
+and 0.8988 accuracy, versus 0.8539 accuracy with weighting. The higher negative
+F1 with weighting (0.6148 versus 0.5770) explains the selection despite the
+accuracy trade-off. The BiLSTM begins with Adam, learning rate $10^{-3}$, hidden width 128
+per direction, dropout 0.3, trainable embeddings, and ordinary cross-entropy.
+A sequential search changes learning rate ($10^{-3}$ or $5\times10^{-4}$),
+hidden width (64, 128 or 256), dropout (0.3 or 0.5), embedding freezing, then
+class weighting. This limits cost and isolates each comparison near the
+incumbent configuration. A factorial search would be needed to estimate
+interactions between settings.
+The learning rate controls step size, dropout reduces overfitting, and
+freezing tests whether source supervision benefits from updating GloVe.
+Class weighting changes gradients during training, while threshold tuning
+changes the operating point after training. Each run uses batches of 64,
+gradient clipping at 1.0, up to 10 epochs and patience of two epochs.
+
+Candidates are ranked by validation Macro-F1 at threshold 0.5. The selected
+BiLSTM configuration is repeated with seeds 42, 43 and 44. We use the
+standard deviation to describe run-to-run variability. Since the same
+validation fold also guides tuning and early stopping, these are model-selection
+scores. The unlabeled product test set is used for prediction.
+For each model, the accuracy and Macro-F1 thresholds are then fitted separately
+on the validation probabilities.
+
+The sequential sweep ran seven configurations, followed by the three final fits. The selected learning rate is $0.001$, with width 128 per direction, dropout 0.3, trainable embeddings, and ordinary cross-entropy. The single-seed Macro-F1 is $0.8383\pm0.0050$ (mean and population standard deviation). The three-seed probability average reaches 0.8524 Macro-F1 at threshold 0.5. Its validation-selected thresholds are $\tau_{\mathrm{acc}}=0.500$ and $\tau_{\mathrm{F1}}=0.500$. The individual settings and scores are recorded in \texttt{outputs/bilstm/hparam\_log.csv}.
+
+\paragraph{Transformer.}
+The planned search compares learning rates $10^{-5}$, $2\times10^{-5}$ and
+$3\times10^{-5}$, with and without class-weighted loss. Small steps and warm-up
+reduce abrupt changes to the pretrained representation.
+\tbd{C: add the actual search, selected setting and its measured results.}

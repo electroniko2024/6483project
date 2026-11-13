@@ -81,12 +81,17 @@ Three settings were tuned by grouped 5-fold cross-validation:
 The selected representation has 50{,}000 word 1--2-gram features. It is very sparse: 86 non-zeros per review on average, a density of 0.17\%.
 
 \paragraph{4b. Static word embeddings (L2).}
-\tbd{B: please check and adjust this paragraph.}
-Reviews are lower-cased and tokenised into words. The vocabulary is built on the training part (minimum frequency~2) plus \texttt{<pad>} and \texttt{<unk>} tokens.
-Each token is mapped to its 300-dimensional \texttt{glove.6B} vector~\cite{pennington2014glove}, pre-trained on 6 billion tokens of Wikipedia and Gigaword.
-Words without a GloVe vector are \tbd{randomly initialised / mapped to \texttt{<unk>}}. Their share of validation tokens is \tbd{OOV rate}.
-For the averaged-embedding classifier, a review is the mean of its token vectors, a dense $\mathbb{R}^{300}$ input.
-For the BiLSTM, a review is a sequence of token ids truncated to 256 tokens and padded only to the longest review in each mini-batch.
+The L2 tokenizer lowercases and unescapes the text, retains contractions and
+the punctuation tokens \texttt{!} and \texttt{?}, and keeps up to 256 tokens.
+The vocabulary is built only on the training portion, with minimum frequency
+two and special \texttt{<pad>} and \texttt{<unk>} entries. Of 6,796 ordinary
+training vocabulary entries, 6,359 have a vector in the 300-dimensional
+\texttt{glove.6B} table~\cite{pennington2014glove}.
+On validation, 3.17\% of token occurrences map to \texttt{<unk>}, and
+4.95\% have no usable pretrained vector after applying the vocabulary.
+Mean GloVe averages only the covered vectors. BiLSTM gives each in-vocabulary
+entry missing a GloVe vector and the shared unknown entry a random initial
+vector. Padding is excluded from both directions and the pooled statistics.
 
 \paragraph{4c. Subword tokens for a pre-trained Transformer (L3).}
 \tbd{C: please check and adjust this paragraph.}
