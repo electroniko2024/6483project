@@ -1,6 +1,3 @@
-% Owner: member A (integration). The GloVe paragraph is drafted from the
-% agreed plan and must be checked by B; the RoBERTa paragraph by C.
-
 \paragraph{Choice of feature format.}
 We compare three feature formats of increasing cost, one per model line, so that (g) can measure the trade-off directly:
 \begin{enumerate}
@@ -15,7 +12,7 @@ Figure~\ref{fig:b-pipeline} summarises the pipeline. All three formats share the
 \begin{tikzpicture}[
   node distance=4mm and 6mm,
   box/.style={draw, rounded corners=2pt, align=center, font=\footnotesize, minimum height=8mm, text width=27mm, fill=gray!8},
-  fbox/.style={box, text width=36mm, fill=blue!6},
+  fbox/.style={box, text width=36mm, fill=gray!20},
   arr/.style={-{Stealth[length=2mm]}, thick}]
 \node[box] (load) {Load \texttt{train.json}\\(7{,}401) / \texttt{test.json} (1{,}851)};
 \node[box, right=of load] (audit) {Audit: imbalance,\\lengths, duplicates};

@@ -21,3 +21,13 @@ report/*.fls
 report/*.fdb_latexmk
 report/*.synctex.gz
 report/*.xdv
+report/report.aux
+report/report.log
+report/report.out
+report/report.toc
+report/report.bbl
+report/report.blg
+report/report.fls
+report/report.fdb_latexmk
+report/report.xdv
+report/main.pdf

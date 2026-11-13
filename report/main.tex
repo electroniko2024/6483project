@@ -1,6 +1,5 @@
-% EE6483 Mini Project (Option 1) report. Master file, integrated by member A.
-% Each section lives in sections/<id>.tex; the owner of each file is noted at
-% its top. Compile: latexmk -xelatex main.tex  (or upload the report/ folder to Overleaf)
+% EE6483 Mini Project (Option 1) report. Each section lives in sections/<id>.tex.
+% Compile: latexmk -xelatex main.tex  (or upload the report/ folder to Overleaf)
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=2.2cm]{geometry}
 \usepackage{fontspec}
@@ -13,19 +12,18 @@
 \usepackage{multirow}
 \usepackage{array}
 \usepackage{xcolor}
+\color{black}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit}
 \usepackage[numbers,sort&compress]{natbib}
-\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black,filecolor=black]{hyperref}
 
 \graphicspath{{figures/}}
 \setlist{itemsep=2pt,topsep=3pt}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
-% \tbd{...}: placeholder for numbers/text another member still has to supply.
-\newcommand{\tbd}[1]{\textcolor{red}{[TBD: #1]}}
 
 \title{EE6483 Artificial Intelligence and Data Mining\\Mini Project (Option 1): Sentiments of Product Reviews}
 \author{Team 110}
