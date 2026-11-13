@@ -1,3 +1,56 @@
-% Owner: member C. Placeholder created by A; replace with the section text.
 \subsection{(a)(3) Top research groups}
-\tbd{member C}
+
+Erik Cambria's research group at Nanyang Technological University
+studies how commonsense knowledge can help a system judge the
+sentiment of a text and explain its decision. SenticNet 7 and
+SenticNet 8 show how this line of work developed. The first paper
+focuses on building a knowledge base that links different expressions
+to shared concepts. The second extends this approach by examining
+what those concepts mean in a sentence.
+
+\paragraph{SenticNet 7 (2022).}
+Cambria et al.~\citep{cambria2022senticnet} use XLNet to propose
+words and phrases that could express a similar meaning in context.
+A similarity measure based on links to emotion concepts in ConceptNet
+helps separate expressions that may look alike in context but carry
+different feelings. The resulting knowledge base includes both
+single words and phrases. For example, it treats ``dead right'' as
+a phrase with its own meaning, so the word ``dead'' does not determine
+its sentiment on its own.
+
+The authors compared SenticNet 7 with 20 sentiment lexicons on ten
+datasets, including Amazon reviews and IMDb reviews. They attributed
+part of its performance to wider vocabulary coverage, since missing
+entries were a common source of errors for other lexicons. Sarcasm
+and sentences that express opposing opinions about different targets
+still caused errors. A larger vocabulary helps the system recognise
+more expressions, while deciding which opinion applies to which
+target remains a separate problem.
+
+\paragraph{SenticNet 8 (2024).}
+SenticNet 8 combines a commonsense knowledge base with a hierarchical
+attention network that identifies which tokens are most relevant
+to the sentiment decision~\citep{cambria2024senticnet}. Its text
+processing goes from standardising the wording to grouping expressions
+with similar meanings, then to describing the situation those
+expressions refer to. The paper illustrates this with several ways
+of describing a phone purchase. Phrases such as ``buy a phone'' and
+``pay for a phone'' can both be represented as a change in who owns
+the phone. This example makes the purpose of the intermediate
+representation easier to see.
+
+On the Sentiment140 polarity task, SenticNet 8 achieved 88.80\%
+accuracy, compared with 85.07\% for the RoBERTa baseline in the same
+paper. The test texts were tweets, so applying the method to product
+reviews would require a separate evaluation.
+
+\paragraph{Relevance to product reviews.}
+Review 1123 in part (f) illustrates the issue of opinion targets.
+The reviewer describes old plastic luggage tags cracking and
+breaking, then explains why the new leather tag was a better
+purchase. RoBERTa predicted a negative label, whereas the final
+human label was positive. An analysis that links the damage to the
+old tags and the recommendation to the new tag could preserve the
+distinction that matters for this review. Whether SenticNet would
+classify this example correctly remains an open question for a
+direct comparison on the same data.
