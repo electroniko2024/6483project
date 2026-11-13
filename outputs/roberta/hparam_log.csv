@@ -1,0 +1,2 @@
+seed,lr,batch_size,max_length,epochs,best_epoch,loss,val_acc@0.5,val_macro_f1@0.5
+42,2e-05,8,256,1,1,unweighted cross-entropy,0.9591152815013405,0.9182310772578499
