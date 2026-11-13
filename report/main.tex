@@ -1,12 +1,13 @@
 % EE6483 Mini Project (Option 1) report. Master file, integrated by member A.
 % Each section lives in sections/<id>.tex; the owner of each file is noted at
-% its top. Compile: latexmk -pdf main.tex  (or upload the report/ folder to Overleaf)
+% its top. Compile: latexmk -xelatex main.tex  (or upload the report/ folder to Overleaf)
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=2.2cm]{geometry}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{multirow}
@@ -83,8 +84,9 @@ All members contributed papers to the literature table in (a)(2) and cross-revie
 
 \appendix
 \section{Code and instructions}
-The code is in the \texttt{src/} folder of the submitted archive; \texttt{README.md}
-lists the commands to reproduce every result. \tbd{C: final README summary}
+The code is in the \texttt{src/} folder. The project
+\texttt{README.md} explains how to run the models and regenerate the
+final predictions from the saved outputs.
 
 \bibliographystyle{unsrtnat}
 \bibliography{refs}

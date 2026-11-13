@@ -43,17 +43,63 @@ Expected: `train part 5909, val 1492, val negatives 218, group overlap 0`.
 ## Run instructions
 All commands are run from the project root.
 
-| Step | Command | Output | Time (CPU) |
+| Step | Command | Output | Runtime / hardware |
 |---|---|---|---|
 | TF-IDF baselines (grid search with grouped 5-fold CV) | `python src/tfidf_models.py` | `outputs/tfidf_lr/`, `outputs/tfidf_svm/`, `outputs/tfidf_cnb/`, baseline `submission.csv` | ~6 min (10 parallel jobs); `--quick` <1 min |
 | Noise-label experiment, question (i) | `python src/noise_exp.py` | `outputs/noise_exp/` | a few minutes |
-| GloVe + BiLSTM (B) | TODO | `outputs/glove_lr/`, `outputs/bilstm/` | |
-| RoBERTa fine-tuning (C) | TODO | `outputs/roberta/` | GPU |
-| Ensemble + final submission (C) | TODO | `submission.csv` | |
+| GloVe + BiLSTM (B) | `python src/glove_bilstm.py` | `outputs/glove_lr/`, `outputs/bilstm/` | CPU or GPU |
+| RoBERTa fine-tuning (C) | See the commands below | `outputs/roberta_seed42/`, `outputs/roberta_seed43/`, `outputs/roberta_seed44/` | CUDA GPU |
+| Generate final predictions (C) | `python src/ensemble.py` | `submission_candidate.csv` | seconds |
 | Resource vs accuracy, question (g) | `python src/resource_table.py` | `outputs/resource/` | seconds |
 | TF-IDF dimension study, question (g) | `python src/tfidf_dim_study.py` | `outputs/resource/tfidf_dim_study.*` | ~1 min |
 
 `python src/tfidf_models.py --quick` runs a reduced grid for a fast check.
 
+### GloVe and BiLSTM
+
+Run `python src/glove_bilstm.py` from the project root after placing
+`glove.6B.300d.txt` in `data/`. The script is on `member-b` and is
+available in the project root after that branch is integrated.
+
+### RoBERTa and final predictions
+
+To reproduce the three training runs, activate a CUDA-enabled Python
+environment and run the following from the project root in PowerShell:
+
+```powershell
+foreach ($seed in 42, 43, 44) {
+    python src/transformer_ft.py --model roberta --epochs 1 --batch-size 4 --max-length 256 --lr 2e-5 --seed $seed
+    if ($LASTEXITCODE -ne 0) { throw "Training failed for seed $seed" }
+}
+```
+
+The archived seed 42 results are in `outputs/roberta/`. The current
+training script writes a new seed 42 run to `outputs/roberta_seed42/`,
+while `ensemble.py` reads `outputs/roberta/`. If you retrain, copy the
+new seed 42 outputs into the directory used by `ensemble.py`:
+
+```powershell
+New-Item -ItemType Directory -Force outputs/roberta | Out-Null
+Copy-Item outputs/roberta_seed42/* outputs/roberta/ -Force
+```
+
+With the archived predictions, run `python src/ensemble.py` directly.
+It averages the three positive-class probabilities and applies the
+validation threshold of 0.680. Check that `submission_candidate.csv`
+has 1,851 rows with columns `reviews,predictions`. To replace the
+official submission after checking the candidate, run
+`Copy-Item submission_candidate.csv submission.csv -Force`.
+
 ## Report
-`report/main.tex` (sections in `report/sections/`, one file per question; owner noted at the top of each file). Build with `latexmk -pdf main.tex` inside `report/` or upload the folder to Overleaf. Red `[TBD: ...]` marks text or numbers a member still has to supply.
+
+Build `report/main.tex` with XeLaTeX. The report uses Times New Roman.
+From the `report/` directory, run:
+
+```bash
+xelatex -halt-on-error main.tex
+bibtex main
+xelatex -halt-on-error main.tex
+xelatex -halt-on-error main.tex
+```
+
+Open `report/main.pdf` to check the compiled report.
