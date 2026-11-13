@@ -1,0 +1,37 @@
+{
+  "model": "roberta",
+  "feature": "pretrained Transformer subword features",
+  "seeds": [
+    43
+  ],
+  "val_acc@0.5": 0.9537533512064343,
+  "val_macro_f1@0.5": 0.9098831127564049,
+  "val_neg_f1@0.5": 0.8470066518847007,
+  "val_auc": 0.9750226837382802,
+  "confusion@0.5": [
+    [
+      191,
+      27
+    ],
+    [
+      42,
+      1232
+    ]
+  ],
+  "thr_acc": 0.48,
+  "val_acc@thr_acc": 0.9557640750670241,
+  "val_macro_f1@thr_acc": 0.9133266674177557,
+  "thr_f1": 0.48,
+  "val_macro_f1@thr_f1": 0.9133266674177557,
+  "val_acc@thr_f1": 0.9557640750670241,
+  "seed_std_macro_f1": 0.0,
+  "n_params": 124647170,
+  "feature_dim": 768,
+  "train_time_s": 114.12389999999999,
+  "infer_time_s": 7.7617522999999835,
+  "peak_mem_mb": 2434.10791015625,
+  "hardware": "CPU: AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD (16 threads); GPU: NVIDIA GeForce RTX 3070 Ti Laptop GPU",
+  "best_epoch": 1,
+  "precision": "fp32",
+  "lr_schedule": "linear_with_10pct_warmup"
+}
