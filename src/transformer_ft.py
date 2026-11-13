@@ -130,7 +130,7 @@ def main():
         "loss": "unweighted cross-entropy", "precision": "fp32", "lr_schedule": "constant",
         "val_acc@0.5": metrics["val_acc@0.5"], "val_macro_f1@0.5": metrics["val_macro_f1@0.5"],
     }])
-    out = save_outputs(args.model, val_output, test_output, metrics, log)
+    out = save_outputs(f"{args.model}_seed{args.seed}", val_output, test_output, metrics, log)
     print("Saved:", out)
 
 
