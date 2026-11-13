@@ -8,7 +8,7 @@ data/        train.json test.json (in git, only ~3 MB)
 splits/      val_idx.npy                 shared validation indices (do not regenerate)
 src/         common.py, tfidf_models.py, noise_exp.py, resource_table.py (A)
              glove_bilstm.py (B)
-             transformer_ft.py, ensemble.py (C)
+             transformer_ft.py, transformer_ft_warmup.py, ensemble.py (C)
 outputs/     <model_name>/ val_probs.csv test_probs.csv metrics.json hparam_log.csv
              noise_exp/  results + figures for (i)
              resource/   resource-vs-accuracy table + figure for (g)
@@ -48,7 +48,7 @@ All commands are run from the project root.
 | TF-IDF baselines (grid search with grouped 5-fold CV) | `python src/tfidf_models.py` | `outputs/tfidf_lr/`, `outputs/tfidf_svm/`, `outputs/tfidf_cnb/`, baseline `submission.csv` | ~6 min (10 parallel jobs); `--quick` <1 min |
 | Noise-label experiment, question (i) | `python src/noise_exp.py` | `outputs/noise_exp/` | a few minutes |
 | GloVe + BiLSTM (B) | `python src/glove_bilstm.py` | `outputs/glove_lr/`, `outputs/bilstm/` | CPU or GPU |
-| RoBERTa fine-tuning (C) | See the commands below | `outputs/roberta/` (seed 42), `outputs/roberta_seed43/`, `outputs/roberta_seed44/` | CUDA GPU |
+| RoBERTa fine-tuning (C) | See the commands below | `outputs/roberta_seed42_warmup/`, `outputs/roberta_seed43_warmup/`, `outputs/roberta_seed44_warmup/` | CUDA GPU |
 | Generate final predictions (C) | `python src/ensemble.py` | `submission_candidate.csv` (copied to `submission.csv` for the final submission) | seconds |
 | Resource vs accuracy, question (g) | `python src/resource_table.py` | `outputs/resource/` | seconds |
 | TF-IDF dimension study, question (g) | `python src/tfidf_dim_study.py` | `outputs/resource/tfidf_dim_study.*` | ~1 min |
@@ -73,32 +73,41 @@ available in the project root after that branch is integrated.
 
 ### RoBERTa and final predictions
 
-To reproduce the three training runs, activate a CUDA-enabled Python
-environment and run the following from the project root in PowerShell:
+The final submission uses the average positive-class probabilities
+from three RoBERTa-base runs with seeds 42, 43, and 44. Each run used
+one epoch, 10% learning-rate warmup followed by linear decay, and a
+peak learning rate of `2e-5`.
+
+To reproduce the training runs, activate a CUDA-enabled Python
+environment and run the following in PowerShell from the project root:
 
 ```powershell
 foreach ($seed in 42, 43, 44) {
-    python src/transformer_ft.py --model roberta --epochs 1 --batch-size 4 --max-length 256 --lr 2e-5 --seed $seed
+    python src/transformer_ft_warmup.py --model roberta --epochs 1 --batch-size 4 --max-length 256 --lr 2e-5 --seed $seed
     if ($LASTEXITCODE -ne 0) { throw "Training failed for seed $seed" }
 }
 ```
 
-The archived seed 42 results are in `outputs/roberta/`. The current
-training script writes a new seed 42 run to `outputs/roberta_seed42/`,
-while `ensemble.py` reads `outputs/roberta/`. If you retrain, copy the
-new seed 42 outputs into the directory used by `ensemble.py`:
+To regenerate predictions from the saved warmup outputs, run:
 
 ```powershell
-New-Item -ItemType Directory -Force outputs/roberta | Out-Null
-Copy-Item outputs/roberta_seed42/* outputs/roberta/ -Force
+python src/ensemble.py
 ```
 
-With the archived predictions, run `python src/ensemble.py` directly.
-It averages the three positive-class probabilities and applies the
-validation threshold of 0.680. Check that `submission_candidate.csv`
-has 1,851 rows with columns `reviews,predictions`. To replace the
-official submission after checking the candidate, run
-`Copy-Item submission_candidate.csv submission.csv -Force`.
+The script averages the three sets of probabilities and applies the
+validation-selected threshold of `0.590`. It writes
+`submission_candidate.csv` with 1,851 rows and the columns
+`reviews,predictions`. The saved runs yield 1,568 positive and 283
+negative predictions.
+
+To update the final submission after checking the candidate, run:
+
+```powershell
+Copy-Item -LiteralPath .\submission_candidate.csv -Destination .\submission.csv -Force
+```
+
+The TF-IDF baseline script also writes `submission.csv`. If you run it,
+regenerate the RoBERTa submission afterward.
 
 ## Report
 
