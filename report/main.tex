@@ -34,7 +34,9 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{4pt}
 \begin{document}
-\maketitle
+\vspace*{-1.8cm}
+{\let\newpage\relax\maketitle}
+\vspace{-0.6cm}
 
 \section*{Group members and contributions}
 \begin{table}[h]
@@ -51,7 +53,8 @@ YIN JIYANG & G2605135H & RoBERTa fine-tuning, ensemble and final submission, err
 \end{table}
 All members contributed papers to the literature table in (a)(2) and cross-reviewed each other's sections.
 
-\tableofcontents
+% Compact table of contents so the cover, contribution table and contents fit on page 1.
+{\setlength{\parskip}{0pt}\small\tableofcontents}
 \newpage
 
 \section{(a) Literature survey}
