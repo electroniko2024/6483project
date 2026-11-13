@@ -28,7 +28,7 @@ zero-mean Gaussian with standard deviation 0.05, and the padding row
 is fixed at zero. The input is a batch of integer token IDs of shape
 $B \times L$, where $B$ is the batch size and $L \leq 256$.
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \begin{tikzpicture}[
   node distance=3mm,
@@ -88,7 +88,7 @@ and after the layer during training. The final linear layer gives
 one score per class. Softmax converts the two scores to probabilities,
 and the positive-class probability is retained for prediction.
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \begin{tikzpicture}[
   node distance=6mm,

@@ -20,7 +20,23 @@
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black,filecolor=black]{hyperref}
 
 \graphicspath{{../figures/}}
-\setlist{itemsep=2pt,topsep=3pt}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,partopsep=0pt}
+\setlist[itemize]{label=\textendash}
+\usepackage[compact]{titlesec}
+\titlespacing*{\section}{0pt}{1.4ex plus .4ex minus .2ex}{0.7ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{1.1ex plus .3ex minus .2ex}{0.5ex plus .1ex}
+\titlespacing*{\paragraph}{0pt}{0.8ex plus .3ex minus .2ex}{0.8em}
+\captionsetup{font=small,skip=4pt}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \renewcommand{\abstractname}{摘要}
 \renewcommand{\refname}{参考文献}
@@ -33,7 +49,7 @@
 \date{2026 年 11 月}
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{4pt}
+\setlength{\parskip}{2pt plus 1pt}
 \setlength{\emergencystretch}{2em}
 \begin{document}
 \vspace*{-1.8cm}
@@ -78,7 +94,7 @@ YIN JIYANG & G2605135H & \texttt{\footnotesize jiyang002@e.ntu.edu.sg} & RoBERTa
 第~\ref{sec:related} 节回顾相关文献。第~\ref{sec:data}--\ref{sec:hparams} 节描述数据、模型和参数设置；第~\ref{sec:results}--\ref{sec:formats} 节报告测试集结果、预测分析和特征格式的比较；第~\ref{sec:hotel} 节和第~\ref{sec:noise} 节分别讨论两种迁移场景，第~\ref{sec:conclusion} 节为结论。
 表~\ref{tab:intro-map} 说明作业的每个问题在哪一节回答，附录~\ref{app:code} 说明如何复现结果。
 
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \caption{作业各问题在报告中的对应位置。}
 \label{tab:intro-map}
@@ -164,7 +180,7 @@ YIN JIYANG & G2605135H & \texttt{\footnotesize jiyang002@e.ntu.edu.sg} & RoBERTa
 \end{itemize}
 这些方法是我们回答第~\ref{sec:hotel} 节问题的基础。
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{不同设定下情感分类的解决方案类型。本项目的设定以 $\star$ 标出。}
 \label{tab:a1-settings}
@@ -197,12 +213,12 @@ YIN JIYANG & G2605135H & \texttt{\footnotesize jiyang002@e.ntu.edu.sg} & RoBERTa
 \subsection{近期进展}\label{sec:recent}
 表~\ref{tab:recent-sentiment} 涵盖领域自适应、情感感知的表示学习以及分布偏移下的评估。各论文报告的结果使用不同的基准和评测协议。
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{情感分类与迁移方向的近期代表性工作。}
 \label{tab:recent-sentiment}
-\small
-\renewcommand{\arraystretch}{1.08}
+\footnotesize
+\renewcommand{\arraystretch}{1.0}
 \begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}p{.16\textwidth}
   >{\raggedright\arraybackslash}p{.20\textwidth} Y Y@{}}
 \toprule
@@ -282,7 +298,7 @@ SenticNet 8 把常识知识库与一个层次注意力网络结合，后者找�
 \end{enumerate}
 图~\ref{fig:b-pipeline} 概括了整个流程。三种格式共享下面描述的读取、检查、划分和清洗步骤。
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \begin{tikzpicture}[
   node distance=4mm and 6mm,
@@ -377,7 +393,7 @@ RoBERTa 的运行使用不加权的交叉熵。第~\ref{sec:hparams} 节说明�
 
 BiLSTM 使用同一个训练词表来初始化大小为 $V \times 300$ 的嵌入矩阵，其中 $V$ 为词表大小。没有预训练向量的条目用均值为零、标准差为 0.05 的高斯分布初始化，填充行固定为零。输入是形状为 $B \times L$ 的整数词元编号批次，其中 $B$ 为批大小，$L \leq 256$。
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \begin{tikzpicture}[
   node distance=3mm,
@@ -413,7 +429,7 @@ BiLSTM 使用同一个训练词表来初始化大小为 $V \times 300$ 的嵌入
 
 编码器在每个词元位置输出 768 维表示。分类头读取第一个词元 \texttt{<s>} 处的表示：先经过一个带 tanh 激活的全连接层，训练时该层前后各有一个 dropout，最后的线性层为每个类别输出一个分数。Softmax 把两个分数转成概率，保留正类概率用于预测。
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \begin{tikzpicture}[
   node distance=6mm,
@@ -535,7 +551,7 @@ RoBERTa 把评论 549 判为正面，尽管评论者反映靴子的搭扣断了�
 特征格式决定两件事：到达分类器的信息是什么（只有词的身份、词的相似性，还是词在上下文中的含义），以及获得这些信息需要多少计算和内存。
 我们先从一般角度比较三种格式（表~\ref{tab:g-qual}），然后报告在本数据集上的实测结果（表~\ref{tab:g-measured}），最后在 TF-IDF 这条线内部单独考察特征维度的影响（表~\ref{tab:g-dims}）。
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{本项目使用的三种特征格式的比较。}
 \label{tab:g-qual}
@@ -557,7 +573,7 @@ RoBERTa 把评论 549 判为正面，尽管评论者反映靴子的搭扣断了�
 \end{tabularx}
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{在共享验证集（1{,}492 条评论，其中 218 条负面）上测得的精度与资源占用。训练时间为每次运行的时间（神经模型为每个 seed），不含加载数据和预训练权重的时间。TF-IDF 的运行是确定性的。神经模型对 seed 42/43/44 的概率取平均。RoBERTa 一行使用三次采用 10\% 预热和线性衰减训练的运行，其训练时间为三次运行的平均值，峰值 GPU 显存为三次中的最大值。各条线的硬件不同：TF-IDF 在 AMD 笔记本 CPU（16 线程）上，GloVe 模型在 9 线程 x86-64 CPU 上，RoBERTa 在 NVIDIA RTX 3070 Ti Laptop GPU 上。}
 \label{tab:g-measured}
@@ -579,7 +595,7 @@ RoBERTa-base & 768/词元 & 124{,}647{,}170 & 0.959 & 0.962 & 0.927 & 113.1 & 2{
 $^{\S}$峰值 GPU 显存；其余各行报告的是 CPU 进程内存。
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{TF-IDF 维度的影响。分类器固定（LR，$C{=}10$，平衡类别权重），在训练部分上训练，在验证集上评估。}
 \label{tab:g-dims}
@@ -627,7 +643,7 @@ GloVe 这条线需要预训练的词向量文件。完整的 \texttt{glove.6B.30
 RoBERTa-base 有 1.246 亿个参数。在 RTX 3070 Ti Laptop GPU 上，一个微调 epoch 每个 seed 平均耗时 113.1\,s，三次运行中分配的 GPU 显存最大为 2{,}434\,MiB。在 CPU 上训练的 BiLSTM 平均每个 seed 121.6\,s。这些耗时反映的是各模型所用的硬件。
 图~\ref{fig:g-scatter} 以对数坐标画出验证集 Macro-F1 与训练时间的关系。
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.62\textwidth]{f1_vs_train_time.png}
 \caption{调好阈值后的验证集 Macro-F1 与训练时间（对数坐标）。对于神经网络集成，训练时间按每个 seed 报告。RoBERTa 的点使用三次预热训练的运行。}
@@ -697,7 +713,7 @@ RoBERTa-base 有 1.246 亿个参数。在 RTX 3070 Ti Laptop GPU 上，一个微
   \item \textbf{M3，重加权}：每个样本的权重取其给定标签的折外概率。
 \end{itemize}
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{注入标签噪声后的验证集结果（3 个 seed 的均值 $\pm$ 标准差）。左半部分：阈值 0.5 下的 Macro-F1。右半部分：与阈值无关的 ROC-AUC。``负标签精度''指训练评论中被标为负面的那部分里，真正是负面的比例。在不加类别权重、也不调阈值的情况下，干净基线的 Macro-F1（0.789）低于 第~\ref{sec:formats} 节中调好阈值的 TF-IDF 模型（0.851）。}
 \label{tab:i-noise}
@@ -721,7 +737,7 @@ RoBERTa-base 有 1.246 亿个参数。在 RTX 3070 Ti Laptop GPU 上，一个微
 \footnotesize Macro-F1 的标准差为 0.003--0.020，AUC 的标准差小于 0.008；完整数值见项目代码库（附录~\ref{app:code}）。
 \end{table}
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{noise_symmetric.png}\\[4pt]
 \includegraphics[width=\textwidth]{noise_pos2neg.png}

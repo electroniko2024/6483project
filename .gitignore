@@ -51,3 +51,10 @@ report/zh/report_zh.fdb_latexmk
 report/zh/report_zh.xdv
 report/zh/main_zh.pdf
 code_submission.zip
+EE6483_Team110_submission/
+report/EE6483_Team110_report.*
+!report/EE6483_Team110_report.pdf
+report/zh/EE6483_Team110_report_zh.*
+!report/zh/EE6483_Team110_report_zh.pdf
+report/report.pdf
+report/zh/report_zh.pdf

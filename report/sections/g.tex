@@ -1,7 +1,7 @@
 The feature format decides two things: what information reaches the classifier (word identity only, word similarity, or word meaning in context), and how much computation and memory are needed to obtain it.
 We first compare the three formats in general terms (Table~\ref{tab:g-qual}), then report what we measured on this dataset (Table~\ref{tab:g-measured}), and finally isolate the effect of feature dimensionality inside the TF-IDF line (Table~\ref{tab:g-dims}).
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{Comparison of the three feature formats used in this project.}
 \label{tab:g-qual}
@@ -23,7 +23,7 @@ Data needed & Moderate; benefits from more data & Less, thanks to pre-trained ve
 \end{tabularx}
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{Measured accuracy and resource use on the shared validation split (1{,}492 reviews, 218 negative). Training time is per run (per seed for neural models) and excludes loading data and pre-trained weights. TF-IDF runs are deterministic. Neural models average the probabilities of seeds 42/43/44. The RoBERTa row uses the three runs trained with 10\% warmup and
 linear decay. Its training time is the mean across the three runs,
@@ -47,7 +47,7 @@ RoBERTa-base & 768/token & 124{,}647{,}170 & 0.959 & 0.962 & 0.927 & 113.1 & 2{,
 $^{\S}$Peak GPU memory; the other rows report CPU process memory.
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{Effect of TF-IDF dimensionality, with the classifier fixed (LR, $C{=}10$, balanced class weights), trained on the training part and evaluated on the validation split.}
 \label{tab:g-dims}
@@ -108,7 +108,7 @@ These timings reflect the hardware used for each model.
 Figure~\ref{fig:g-scatter} plots validation Macro-F1 against
 training time on a logarithmic scale.
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.62\textwidth]{f1_vs_train_time.png}
 \caption{Validation Macro-F1 at the tuned threshold versus training

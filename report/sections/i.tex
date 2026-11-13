@@ -1,4 +1,5 @@
-The assignment refers to ``the same sentiment classification problem in (g)''. We read this as the hotel-review project of Section~ef{sec:hotel}: the reviews now come with rating scores, but some of those scores are wrong.
+The assignment refers to ``the same sentiment classification problem in (g)''. We read this as the hotel-review project of Section~
+ef{sec:hotel}: the reviews now come with rating scores, but some of those scores are wrong.
 Training labels derived from the ratings are therefore \emph{noisy}.
 
 \subsection{How our classifier would be affected}
@@ -39,7 +40,7 @@ Methods M1--M3 rely on 5-fold out-of-fold probabilities $p(x)$ computed on the n
   \item \textbf{M3, re-weighting}: each sample is weighted by the out-of-fold probability of its given label.
 \end{itemize}
 
-\begin{table}[tbp]
+\begin{table}[!htbp]
 \centering
 \caption{Validation results under injected label noise (mean $\pm$ std over 3 seeds). Left block: Macro-F1 at threshold~0.5. Right block: ROC-AUC, which does not depend on the threshold. ``Neg.\ prec.'' is the fraction of training reviews labeled negative that are truly negative. Without class weights and threshold tuning, the clean baseline's Macro-F1 (0.789) is lower than the tuned TF-IDF model in Section~\ref{sec:formats} (0.851).}
 \label{tab:i-noise}
@@ -63,7 +64,7 @@ Pos$\to$neg & 5\%  & 0.77 & .802 & \textbf{.823} & .812 & .728 & .935 & \textbf{
 \footnotesize Standard deviations are 0.003--0.020 for Macro-F1 and below 0.008 for AUC; full values are in the project repository (Appendix~\ref{app:code}).
 \end{table}
 
-\begin{figure}[tbp]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{noise_symmetric.png}\\[4pt]
 \includegraphics[width=\textwidth]{noise_pos2neg.png}

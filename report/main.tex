@@ -22,7 +22,23 @@
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black,filecolor=black]{hyperref}
 
 \graphicspath{{figures/}}
-\setlist{itemsep=2pt,topsep=3pt}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,partopsep=0pt}
+\setlist[itemize]{label=\textendash}
+\usepackage[compact]{titlesec}
+\titlespacing*{\section}{0pt}{1.4ex plus .4ex minus .2ex}{0.7ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{1.1ex plus .3ex minus .2ex}{0.5ex plus .1ex}
+\titlespacing*{\paragraph}{0pt}{0.8ex plus .3ex minus .2ex}{0.8em}
+\captionsetup{font=small,skip=4pt}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 
 \title{EE6483 Artificial Intelligence and Data Mining\\Mini Project (Option 1): Sentiments of Product Reviews}
@@ -30,7 +46,7 @@
 \date{November 2026}
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{4pt}
+\setlength{\parskip}{2pt plus 1pt}
 \setlength{\emergencystretch}{2em}
 \begin{document}
 \vspace*{-1.8cm}
