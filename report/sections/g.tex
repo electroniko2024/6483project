@@ -17,8 +17,8 @@ We first compare the three formats in general terms (Table~\ref{tab:g-qual}), th
 Representation & Sparse, one dimension per n-gram (here 50k; 0.17\% non-zero) & Dense, 300 per token; mean-pooled or sequential & Dense, 768 per subword token, context-dependent \\
 Word order / context & Only local, via bigrams & Mean: none. BiLSTM: learned sequentially & Full self-attention over 256 tokens \\
 Similar words & Unrelated dimensions (``great'' vs ``excellent'') & Close in vector space & Close, and disambiguated by context \\
-Out-of-vocabulary words & Dropped (2.1\% of validation tokens, 24\% of word types) & \texttt{<unk>} or random vector (\tbd{B: OOV rate}) & None: unknown words are split into subwords \\
-Trainable parameters & $\approx$\,dimension $+\,1$ (50k) & Mean+LR: 301. BiLSTM: $\approx$0.8M + embeddings & $\approx$125M \\
+Out-of-vocabulary words & Dropped (2.1\% of validation tokens, 24\% of word types) & \texttt{<unk>} or random vector (3.2\% of validation tokens are \texttt{<unk>}; 5.0\% have no pre-trained vector) & None: unknown words are split into subwords \\
+Trainable parameters & $\approx$\,dimension $+\,1$ (50k) & Mean+LR: 301. BiLSTM: 2.9M including the embedding table & $\approx$125M \\
 Hardware / training cost & CPU, seconds & CPU, minutes (BiLSTM) & GPU, minutes to hours \\
 Memory & Sparse matrix of a few MB & Embedding table $V\times300$ (the full GloVe file is $\approx$1\,GB) & $\approx$0.5\,GB of weights plus activations \\
 Interpretability & High: one weight per n-gram & Low & Low (needs attribution methods) \\
@@ -29,7 +29,7 @@ Data needed & Moderate; benefits from more data & Less, thanks to pre-trained ve
 
 \begin{table}[t]
 \centering
-\caption{Measured accuracy and resource use on the shared validation split (1{,}492 reviews, 218 negative). Training time excludes loading data and pre-trained weights. TF-IDF runs are deterministic, so their seed standard deviation is 0. Neural models are averaged over seeds 42/43/44. Hardware: \tbd{all: confirm} TF-IDF on an AMD laptop CPU (16 threads).}
+\caption{Measured accuracy and resource use on the shared validation split (1{,}492 reviews, 218 negative). Training time is per run (per seed for neural models) and excludes loading data and pre-trained weights. TF-IDF runs are deterministic. Neural models average the probabilities of seeds 42/43/44. Hardware differs by line: TF-IDF on an AMD laptop CPU (16 threads), GloVe models on a 9-thread x86-64 CPU, RoBERTa on an NVIDIA RTX 3070 Ti Laptop GPU.}
 \label{tab:g-measured}
 \small
 \resizebox{\textwidth}{!}{%
@@ -41,11 +41,13 @@ TF-IDF + LR            & 50{,}000 & 50{,}001  & 0.924 & 0.928 & 0.851 & 1.5 & 12
 TF-IDF + LinearSVC     & 50{,}000 & 150{,}009$^{\dagger}$ & 0.929 & 0.930 & 0.857 & 2.8 & 150 \\
 TF-IDF + ComplementNB  & 10{,}000 & 20{,}000  & 0.910 & 0.926 & 0.857 & 1.2 & 155 \\
 Mean GloVe + LR & 300 & 301 & 0.854 & 0.899 & 0.788 & 0.06 & 351 \\
-GloVe + BiLSTM & 300/token & 2{,}876{,}010 & 0.930 & 0.930 & 0.852 & 364.66 & 1112 \\
-RoBERTa-base           & 768/token & $\approx$125M & \tbd{C} & \tbd{C} & \tbd{C} & \tbd{C} & \tbd{C} \\
+GloVe + BiLSTM & 300/token & 2{,}876{,}010 & 0.930 & 0.930 & 0.852 & 121.6 & 1{,}112 \\
+RoBERTa-base$^{\ddagger}$ & 768/token & 124{,}647{,}170 & 0.946 & 0.954 & 0.908 & 114.8 & 2{,}434$^{\S}$ \\
 \bottomrule
 \end{tabular}}\\[2pt]
 \footnotesize $^{\dagger}$Three calibrated SVMs, one per internal calibration fold, each with its own weight vector.
+$^{\ddagger}$The seed-44 run failed to train: it outputs $P(\text{pos})\approx0.81$ for every review (validation AUC 0.746). Adding a constant does not change the ranking, so the three-seed average equals the average of seeds 42 and 43 up to a shift of the threshold. Seeds 42 and 43 alone reach Macro-F1@0.5 of 0.897 and 0.884. \tbd{C: update this row if seed 44 is re-run.}
+$^{\S}$Peak GPU memory (\texttt{torch.cuda.max\_memory\_allocated}); the other rows report CPU process memory.
 \end{table}
 
 \begin{table}[t]
@@ -83,19 +85,25 @@ TF-IDF already reaches 92.8--93.0\% accuracy, because most reviews contain stron
 The largest LR weights are intuitive: ``disappointed'', ``uncomfortable'', ``returned'' and ``poor'' for negative reviews, ``great'', ``comfortable'', ``perfect'' and ``love'' for positive ones.
 However, the unigram ``not'' alone receives the most negative weight. As a result, ``not bad'' gets only a small positive bigram weight (+0.59), which barely offsets the strongly negative ``not'' and ``bad'', while ``not worth'' (-3.31) is captured correctly.
 This is exactly where order-aware and contextual features should help: negation, contrast (``but the\dots'' is among the top negative features) and implicit sentiment.
-\tbd{After B and C push results: state the measured gain of BiLSTM and RoBERTa over TF-IDF and whether it exceeds the seed standard deviation; cross-reference the error categories in (f).}
+The measured results in Table~\ref{tab:g-measured} confirm this.
+RoBERTa reaches 95.4\% accuracy and 0.908 Macro-F1 at the tuned threshold, against 93.0\% and 0.857 for the best TF-IDF model, and its AUC rises from 0.950 to 0.980.
+The Macro-F1 gain of about 0.05 is roughly eight times the seed-to-seed standard deviation of the two valid RoBERTa runs (0.006), so it is a real improvement and not split noise.
+The BiLSTM, by contrast, only matches TF-IDF: its three-seed average reaches 0.852 (single runs 0.838\,$\pm$\,0.005), against 0.851--0.857. With 5.9k training reviews, static embeddings and a recurrent encoder learned from scratch capture no more than the n-gram weights do.
+Averaging GloVe vectors discards both word order and the identity of rare but decisive words, and drops to 0.788.
+The gain therefore comes from \emph{contextual, pre-trained} representations rather than from sequence modelling alone; (f) shows the kinds of reviews where RoBERTa is right and TF-IDF is wrong.
 
 \paragraph{Across formats: resources.}
 Resource use grows much faster than accuracy.
 TF-IDF + LR trains in about 1.5\,s on a CPU with about 120\,MB peak memory, and predicts the 1{,}492 validation reviews in a few milliseconds.
-The GloVe line needs the pre-trained embedding file. The full \texttt{glove.6B.300d} table has 400k$\times$300 floats, and only the rows of our vocabulary are kept. The BiLSTM fits take 121.6 s per seed on average (four PyTorch CPU threads). Its table row sums the three final training runs, excluding the hyperparameter sweep. Peak memory for the two GloVe models is process RSS. The GloVe and TF-IDF timings come from different CPUs.
-RoBERTa-base has about 125M parameters, roughly 2{,}500 times the TF-IDF+LR model. It needs a GPU for practical fine-tuning (\tbd{C: time, peak GPU memory}), and inference cost grows with the sequence length because of attention.
+The GloVe line needs the pre-trained embedding file. The full \texttt{glove.6B.300d} table has 400k$\times$300 floats, and only the rows of our vocabulary are kept. The BiLSTM fits take 121.6\,s per seed on average (four PyTorch CPU threads), about 80 times TF-IDF + LR, excluding the hyper-parameter sweep. Peak memory for the two GloVe models is process RSS. The GloVe and TF-IDF timings come from different CPUs.
+RoBERTa-base has 124.6M parameters, roughly 2{,}500 times the TF-IDF+LR model. One fine-tuning epoch took about 115\,s per seed on a laptop RTX 3070 Ti GPU with 2.4\,GB peak GPU memory. Its wall time is similar to the CPU BiLSTM only because of the GPU, and inference cost also grows with the sequence length because of self-attention.
+The BiLSTM is thus the worst trade-off in our comparison: two orders of magnitude more training time than TF-IDF for no accuracy gain. RoBERTa costs more still, but it is the only model that improves on the baseline.
 Figure~\ref{fig:g-scatter} plots accuracy against training time on a log scale.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.62\textwidth]{f1_vs_train_time.png}
-\caption{Validation Macro-F1 (tuned threshold) versus training time (log scale). Regenerated by \texttt{src/resource\_table.py} from every model's \texttt{metrics.json}. \tbd{final version after all outputs are in}}
+\caption{Validation Macro-F1 (tuned threshold) versus training time (log scale). Regenerated by \texttt{src/resource\_table.py} from every model's \texttt{metrics.json}; neural models show the time per seed.}
 \label{fig:g-scatter}
 \end{figure}
 

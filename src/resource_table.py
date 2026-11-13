@@ -12,6 +12,7 @@ sparse (bool), seed_std_macro_f1.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -22,7 +23,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import OUTPUT_DIR, ROOT  # noqa: E402
+from common import OUTPUT_DIR, ROOT, evaluate, make_metrics  # noqa: E402
 
 COLS = ["name", "model", "feature", "feature_dim", "sparse", "n_params",
         "val_acc@0.5", "val_macro_f1@0.5", "val_auc", "thr_acc", "val_acc@thr_acc",
@@ -32,10 +33,40 @@ COLS = ["name", "model", "feature", "feature_dim", "sparse", "n_params",
 
 def main():
     rows = []
-    for f in sorted(OUTPUT_DIR.glob("*/metrics.json")):
-        m = json.loads(f.read_text(encoding="utf-8"))
-        m["name"] = f.parent.name
+    folders = sorted(f.parent for f in OUTPUT_DIR.glob("*/metrics.json"))
+    seed_runs = {}  # base name -> [folders]; C stores seeds as X, X_seed43, X_seed44
+    for d in folders:
+        base = re.sub(r"_seed\d+$", "", d.name)
+        seed_runs.setdefault(base, []).append(d)
+    for base, ds in seed_runs.items():
+        if len(ds) == 1:
+            m = json.loads((ds[0] / "metrics.json").read_text(encoding="utf-8"))
+            m["name"] = base
+            # report time per seed for multi-seed folders (B stores the total)
+            if "mean_single_seed_train_time_s" in m:
+                m["train_time_s"] = m["mean_single_seed_train_time_s"]
+                m["infer_time_s"] = m.get("mean_single_seed_infer_time_s", m.get("infer_time_s"))
+            rows.append(m)
+            continue
+        # several single-seed folders: average their probabilities into one row
+        ms = [json.loads((d / "metrics.json").read_text(encoding="utf-8")) for d in ds]
+        vals = [pd.read_csv(d / "val_probs.csv").sort_values("idx") for d in ds]
+        y = vals[0]["label"].values
+        prob = sum(v["prob_pos"].values for v in vals) / len(vals)
+        per_seed = [evaluate(y, v["prob_pos"].values, 0.5)["macro_f1"] for v in vals]
+        m = make_metrics(
+            ms[0]["model"], ms[0].get("feature", ""), y, prob,
+            seeds=[s for mm in ms for s in mm.get("seeds", [])],
+            seed_macro_f1s=per_seed,
+            n_params=ms[0].get("n_params"), feature_dim=ms[0].get("feature_dim"),
+            train_time_s=sum(mm.get("train_time_s", 0) for mm in ms) / len(ms),
+            infer_time_s=sum(mm.get("infer_time_s", 0) for mm in ms) / len(ms),
+            peak_mem_mb=max(mm.get("peak_mem_mb", 0) for mm in ms),
+            hardware=ms[0].get("hardware"))
+        m["name"] = f"{base} (avg of {len(ds)} seeds)"
         rows.append(m)
+        print(f"{base}: averaged {[d.name for d in ds]}; per-seed val Macro-F1@0.5 "
+              + ", ".join(f"{x:.4f}" for x in per_seed) + "; train_time_s is per seed")
     if not rows:
         print("no metrics.json found under outputs/")
         return
