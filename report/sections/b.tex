@@ -1,13 +1,13 @@
-\paragraph{Choice of feature format.}
-We compare three feature formats of increasing cost, one per model line, so that (g) can measure the trade-off directly:
+\subsection{Feature formats and pipeline}
+We compare three feature formats of increasing cost, one per model line, so that Section~\ref{sec:formats} can measure the trade-off directly:
 \begin{enumerate}
   \item \textbf{Sparse bag-of-n-grams with TF-IDF weighting}, used by linear classifiers;
-  \item \textbf{static pre-trained word embeddings} (300-dimensional GloVe~\cite{pennington2014glove}), used by an averaged-embedding classifier and by a BiLSTM;
+  \item \textbf{static pre-trained word embeddings} (300-dimensional GloVe\cite{pennington2014glove}), used by an averaged-embedding classifier and by a BiLSTM;
   \item \textbf{subword tokens fed to a pre-trained Transformer} (RoBERTa-base), whose contextual representation is fine-tuned end-to-end. This is the format of our final model.
 \end{enumerate}
-Figure~\ref{fig:b-pipeline} summarises the pipeline. All three formats share the loading, auditing, splitting and cleaning steps described below.
+Figure~\ref{fig:b-pipeline} summarizes the pipeline. All three formats share the loading, auditing, splitting and cleaning steps described below.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
   node distance=4mm and 6mm,
@@ -28,13 +28,13 @@ Figure~\ref{fig:b-pipeline} summarises the pipeline. All three formats share the
 \draw[arr] (clean.south) |- ++(0,-4mm) -| (glove.north);
 \draw[arr] (clean.south) -- ++(0,-4mm) -| (bpe.north);
 \end{tikzpicture}
-\caption{Data preprocessing pipeline. Every vectoriser, vocabulary and model is fitted on the training part only; the validation split is used only for model selection and the test set only for the final predictions.}
+\caption{Data preprocessing pipeline. Every vectorizer, vocabulary and model is fitted on the training part only; the validation split is used only for model selection and the test set only for the final predictions.}
 \label{fig:b-pipeline}
 \end{figure}
 
-\paragraph{1. Loading and auditing.}
-Both files are read with \texttt{pandas.read\_json}.
-The training set has 7{,}401 reviews with a binary label (6{,}319 positive, 1{,}082 negative). The test set has 1{,}851 unlabelled reviews. No review is missing or empty.
+\subsection{Data audit}
+Both files are read as JSON tables.
+The training set has 7{,}401 reviews with a binary label (6{,}319 positive, 1{,}082 negative). The test set has 1{,}851 unlabeled reviews. No review is missing or empty.
 Review length varies widely: the median is 42 words, 75\% of reviews have at most 70 words, 97\% at most 178, and the longest has 1{,}066 words.
 We also checked for duplicates, comparing texts after lower-casing and collapsing whitespace:
 \begin{itemize}
@@ -43,15 +43,15 @@ We also checked for duplicates, comparing texts after lower-casing and collapsin
   \item 21 test reviews duplicate another test review.
 \end{itemize}
 
-\paragraph{2. Grouped, stratified validation split.}
+\subsection{Grouped, stratified validation split}
 Every model is tuned on one shared validation split.
-If duplicates were split at random, copies of the same review would land on both sides, and the validation score would partly measure memorisation.
-We therefore group rows by their normalised text and take fold~0 of a 5-fold \texttt{StratifiedGroupKFold} (seed 42).
+If duplicates were split at random, copies of the same review would land on both sides, and the validation score would partly measure memorization.
+We therefore group rows by their normalized text and take fold~0 of a 5-fold \texttt{StratifiedGroupKFold} (seed 42).
 This yields 5{,}909 training and 1{,}492 validation reviews. The validation set contains 218 negatives (14.6\%, the same ratio as the full set), and no text appears on both sides.
 Cross-validation inside the training part, including the internal folds used to calibrate the SVM, uses the same grouping.
 The test set is used only to produce \texttt{submission.csv}.
 
-\paragraph{3. Light text cleaning.}
+\subsection{Text cleaning}
 We unescape HTML entities, collapse runs of whitespace and strip leading and trailing spaces.
 We deliberately do \emph{not}:
 \begin{itemize}
@@ -60,15 +60,15 @@ We deliberately do \emph{not}:
 \end{itemize}
 Text is lower-cased for TF-IDF and GloVe, and kept in its original case for RoBERTa, whose tokenizer is case-sensitive.
 
-\paragraph{4a. TF-IDF features (L1).}
-The text is tokenised with a pattern that keeps single-character tokens (e.g.\ the ``t'' of ``don't'') as well as ``!'' and ``?''.
+\subsection{TF-IDF features (L1)}
+The text is tokenized with a pattern that keeps single-character tokens (e.g.\ the ``t'' of ``don't'') as well as ``!'' and ``?''.
 We extract unigrams and bigrams; bigrams capture short negations such as ``not good'' and ``not worth''.
 Each term $t$ in review $d$ is weighted with sublinear term frequency and smoothed inverse document frequency,
 \begin{equation}
   w_{t,d} = \bigl(1 + \log \mathrm{tf}_{t,d}\bigr)\cdot\Bigl(\log\frac{1+N}{1+\mathrm{df}_t} + 1\Bigr),
 \end{equation}
-where $N$ is the number of training reviews and $\mathrm{df}_t$ the number of reviews containing $t$. Each review vector is then L2-normalised.
-The vectoriser is fitted on the training rows only.
+where $N$ is the number of training reviews and $\mathrm{df}_t$ the number of reviews containing $t$. Each review vector is then L2-normalized.
+The vectorizer is fitted on the training rows only.
 Three settings were tuned by grouped 5-fold cross-validation:
 \begin{itemize}
   \item the minimum document frequency (1, 2 or 3);
@@ -77,30 +77,30 @@ Three settings were tuned by grouped 5-fold cross-validation:
 \end{itemize}
 The selected representation has 50{,}000 word 1--2-gram features. It is very sparse: 86 non-zeros per review on average, a density of 0.17\%.
 
-\paragraph{4b. Static word embeddings (L2).}
+\subsection{Static word embeddings (L2)}
 The L2 tokenizer lowercases and unescapes the text, retains contractions and
 the punctuation tokens \texttt{!} and \texttt{?}, and keeps up to 256 tokens.
 The vocabulary is built only on the training portion, with minimum frequency
 two and special \texttt{<pad>} and \texttt{<unk>} entries. Of 6,796 ordinary
 training vocabulary entries, 6,359 have a vector in the 300-dimensional
-\texttt{glove.6B} table~\cite{pennington2014glove}.
+\texttt{glove.6B} table\cite{pennington2014glove}.
 On validation, 3.17\% of token occurrences map to \texttt{<unk>}, and
 4.95\% have no usable pretrained vector after applying the vocabulary.
 Mean GloVe averages only the covered vectors. BiLSTM gives each in-vocabulary
 entry missing a GloVe vector and the shared unknown entry a random initial
 vector. Padding is excluded from both directions and the pooled statistics.
 
-\paragraph{4c. Subword tokens for a pre-trained Transformer (L3).}
+\subsection{Subword tokens for a pre-trained Transformer (L3)}
 After cleaning, reviews retain their original casing. RoBERTa's
 byte-level BPE tokenizer converts the text to token IDs and adds the
 \texttt{<s>} and \texttt{</s>} tokens. The 256-token limit includes
 these special tokens. When a review is too long, the tokenizer keeps
 the beginning of the text. Each batch is padded to the length of its
 longest sequence, and the attention mask distinguishes input tokens
-from padding. Part (c) describes how the model uses the first token's
+from padding. Section~\ref{sec:models} describes how the model uses the first token's
 representation for classification.
 
-\paragraph{5. Labels and class imbalance.}
+\subsection{Labels and class imbalance}
 Labels are used as given (0 = negative, 1 = positive).
-Each model outputs $P(y{=}1\mid x)$. We report metrics at threshold~0.5 and at thresholds tuned on the validation split: one maximising accuracy (\texttt{thr\_acc}, used for the submission) and one maximising Macro-F1 (\texttt{thr\_f1}).
-The RoBERTa runs used unweighted cross-entropy. Part (d) describes the parameter settings evaluated for the other models.
+Each model outputs $P(y{=}1\mid x)$. We report metrics at threshold~0.5 and at thresholds tuned on the validation split: one maximizing accuracy ($\tau_{\mathrm{acc}}$, used for the submission) and one maximizing Macro-F1 ($\tau_{\mathrm{F1}}$).
+The RoBERTa runs used unweighted cross-entropy. Section~\ref{sec:hparams} describes the parameter settings evaluated for the other models.

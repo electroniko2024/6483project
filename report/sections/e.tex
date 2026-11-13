@@ -2,37 +2,40 @@
 We averaged the positive-class probabilities from the three
 RoBERTa-base runs trained with 10\% warmup and linear decay. At a
 threshold of 0.5, the population standard deviation of single-run
-Macro-F1 decreased from 20.27 percentage points under the original
-schedule to 0.43 percentage points across the same three seeds. On the
-validation set, the final RoBERTa ensemble achieved 92.73\% Macro-F1
+Macro-F1 decreased from 0.203 under the original
+schedule to 0.004 across the same three seeds. On the
+validation set, the final RoBERTa ensemble achieved 0.927 Macro-F1
 after threshold selection. The 75\% RoBERTa and 25\% TF-IDF + SVM
-blend achieved 92.57\% after its own threshold selection, so we used
+blend achieved 0.926 after its own threshold selection, so we used
 the RoBERTa ensemble for submission.
 
 \paragraph{Decision threshold.}
-On the 1,492 labelled validation reviews, a threshold of 0.590 gave
-the highest accuracy (96.25\%) and Macro-F1 (92.73\%) among the
+On the 1,492 labeled validation reviews, a threshold of 0.590 gave
+the highest accuracy (0.962) and Macro-F1 (0.927) among the
 thresholds evaluated for the RoBERTa ensemble. We applied the same
 threshold to the test set, assigning label 1 to reviews with an
 average positive-class probability of at least 0.590 and label 0
 to the remaining reviews.
 
 \paragraph{Test predictions.}
-The table shows the predicted label distribution for the 1,851
-unlabeled test reviews.
+Table~\ref{tab:e-dist} shows the predicted label distribution for the 1,851 unlabeled test reviews.
 
-\begin{center}
+\begin{table}[!htb]
+\centering
+\caption{Predicted label distribution on the 1{,}851 test reviews.}
+\label{tab:e-dist}
+\small
 \begin{tabular}{lrr}
-\hline
+\toprule
 Predicted label & Number of reviews & Share \\
-\hline
-Positive (1)    & 1,568             & 84.71\% \\
-Negative (0)    &   283             & 15.29\% \\
-\hline
-Total           & 1,851             & 100.00\% \\
-\hline
+\midrule
+Positive (1) & 1{,}568 & 84.71\% \\
+Negative (0) & 283 & 15.29\% \\
+\midrule
+Total & 1{,}851 & 100.00\% \\
+\bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
 The file \texttt{submission.csv} contains the \texttt{reviews}
 and \texttt{predictions} columns in the original test-set order.

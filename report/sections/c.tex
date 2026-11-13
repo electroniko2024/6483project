@@ -1,7 +1,7 @@
 \subsection{TF-IDF classifiers}
 
 The three TF-IDF classifiers take the sparse n-gram vectors described
-in part (b). Logistic regression maps a weighted sum of the features
+in Section~\ref{sec:data}. Logistic regression maps a weighted sum of the features
 to a positive-class probability. The linear SVM produces a margin score,
 which is converted to a probability by sigmoid calibration on grouped
 folds within the training split. Complement Naive Bayes estimates
@@ -11,24 +11,24 @@ additive smoothing.
 The feature and classifier settings were selected by grouped five-fold
 cross-validation within the training portion. Each selected model was
 then fitted on 5,909 reviews and evaluated on the shared validation
-set of 1,492 reviews. For test prediction, both the TF-IDF vectoriser
-and the classifier were refitted on all 7,401 labelled reviews.
+set of 1,492 reviews. For test prediction, both the TF-IDF vectorizer
+and the classifier were refitted on all 7,401 labeled reviews.
 
 \subsection{GloVe embeddings and BiLSTM}
 
 The mean-embedding classifier averages the GloVe vectors available for
 the tokens in a review. If none of the tokens has a pre-trained vector,
 the review is represented by a zero vector. The resulting 300 features
-feed a regularised logistic regression classifier.
+feed a regularized logistic regression classifier.
 
-The BiLSTM uses the same training vocabulary to initialise an
+The BiLSTM uses the same training vocabulary to initialize an
 embedding matrix of size $V \times 300$, where $V$ is the vocabulary
-size. Entries without pre-trained vectors are initialised from a
+size. Entries without pre-trained vectors are initialized from a
 zero-mean Gaussian with standard deviation 0.05, and the padding row
 is fixed at zero. The input is a batch of integer token IDs of shape
 $B \times L$, where $B$ is the batch size and $L \leq 256$.
 
-\begin{figure}[htbp]
+\begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
   node distance=3mm,
@@ -39,7 +39,7 @@ $B \times L$, where $B$ is the batch size and $L \leq 256$.
 ]
 \node[modelblock] (tokens) {Token IDs $[B,L]$};
 \node[modelblock, below=of tokens] (embed)
-  {GloVe-initialised embedding $[B,L,300]$};
+  {GloVe-initialized embedding $[B,L,300]$};
 \node[modelblock, below=of embed] (recur)
   {Two bidirectional LSTM layers $[B,L,2H]$};
 \node[modelblock, below=of recur] (pool)
@@ -52,7 +52,7 @@ $B \times L$, where $B$ is the batch size and $L \leq 256$.
 \draw[-{Latex}] (recur) -- (pool);
 \draw[-{Latex}] (pool) -- (out);
 \end{tikzpicture}
-\caption{GloVe-initialised BiLSTM. $H$ denotes the hidden width
+\caption{GloVe-initialized BiLSTM. $H$ denotes the hidden width
 per direction.}
 \label{fig:bilstm}
 \end{figure}
@@ -60,7 +60,7 @@ per direction.}
 In each layer, the backward direction reverses only the valid part of
 the sequence. Both pooling operations ignore padding. Max pooling
 keeps the strongest activation in each channel, while mean pooling
-summarises the valid states. The two pooled vectors are concatenated
+summarizes the valid states. The two pooled vectors are concatenated
 to give the classifier $4H$ features, or 512 when $H=128$.
 
 The BiLSTM was trained with Adam and cross-entropy. In the weighted
@@ -73,7 +73,7 @@ and test probabilities were averaged across seeds 42, 43, and 44.
 \subsection{RoBERTa-base}
 
 \paragraph{Input and classifier.}
-After the light cleaning described in part (b), each review retains its
+After the light cleaning described in Section~\ref{sec:data}, each review retains its
 original casing. The RoBERTa tokenizer splits the text into subwords
 and limits the sequence to 256 tokens, including the special tokens.
 Longer sequences are truncated at the end. Within each batch, shorter
@@ -88,7 +88,7 @@ and after the layer during training. The final linear layer gives
 one score per class. Softmax converts the two scores to probabilities,
 and the positive-class probability is retained for prediction.
 
-\begin{figure}[htbp]
+\begin{figure}[tbp]
 \centering
 \begin{tikzpicture}[
   node distance=6mm,
@@ -100,7 +100,7 @@ and the positive-class probability is retained for prediction.
   arr/.style={-{Stealth[length=2mm]}, thick}
 ]
 \node[box, text width=25mm] (input) {
-  \textbf{Tokenised reviews}\\
+  \textbf{Tokenized reviews}\\
   Token IDs and mask\\
   $B \times L$
 };
@@ -138,12 +138,12 @@ The encoder and classification head were fine-tuned together on the
 runs used one epoch, FP32 precision, a batch size of 4, and unweighted
 cross-entropy. AdamW used a weight decay of 0.01. The learning rate
 increased to \(2 \times 10^{-5}\) over the first 10\% of training
-steps and then decayed linearly to zero. Part (d) describes how
+steps and then decayed linearly to zero. Section~\ref{sec:hparams} describes how
 we selected this schedule.
 
 \paragraph{Prediction.}
 The data split and training settings were fixed across the three
 runs, with random seeds 42, 43, and 44. For each review, the three
 positive-class probabilities were averaged before applying the
-decision threshold. Part (e) explains how the threshold was chosen
+decision threshold. Section~\ref{sec:results} explains how the threshold was chosen
 on the validation set and reports the resulting test predictions.

@@ -1,9 +1,9 @@
-\subsection{(a)(2) Recent papers}
+\subsection{Recent progress}\label{sec:recent}
 Table~\ref{tab:recent-sentiment} covers domain adaptation, sentiment-aware
 representation learning, and evaluation under distribution shift. The
 published results use different benchmarks and protocols.
 
-\begin{table}[htbp]
+\begin{table}[tbp]
 \centering
 \caption{Selected recent work on sentiment classification and transfer.}
 \label{tab:recent-sentiment}
@@ -14,34 +14,34 @@ published results use different benchmarks and protocols.
 \toprule
 Year & Method & Data & Contribution & Reported result \\
 \midrule
-2021 & UDALM~\cite{karouzos2021udalm} & Amazon Reviews, 12 transfers &
-Joint source classification and target masked language modelling &
+2021 & UDALM\cite{karouzos2021udalm} & Amazon Reviews, 12 transfers &
+Joint source classification and target masked language modeling &
 91.74\% accuracy, 1.11 percentage points above the prior comparison. \\
-2022 & Memory-based contrastive learning~\cite{tan2022memory} &
-Two Amazon review datasets and a rumour dataset &
+2022 & Memory-based contrastive learning\cite{tan2022memory} &
+Two Amazon review datasets and a rumor dataset &
 Queue-based supervised contrastive learning for unseen domains &
 Improved over the tested domain adaptation methods. \\
-2022 & Mere contrastive learning~\cite{luo2022mere} &
+2022 & Mere contrastive learning\cite{luo2022mere} &
 Amazon Reviews and FDU-MTL &
 In-batch negatives separate classes in representation space &
 90.39\% mean accuracy over 12 Amazon transfers. \\
-2022 & Multi-domain TSA~\cite{toledoronen2022multi} &
+2022 & Multi-domain TSA\cite{toledoronen2022multi} &
 Yelp for self-training, three target evaluation datasets &
-Augments training with weakly labelled examples across domains &
+Augments training with weakly labeled examples across domains &
 Showed gains across target datasets. \\
-2024 & SentiEval~\cite{zhang2023sentiment} &
+2024 & SentiEval\cite{zhang2023sentiment} &
 26 datasets over 13 sentiment tasks &
 Compares prompted LLMs and task-trained smaller models &
-Simple classification was more favourable to LLMs than fine-grained structured tasks. \\
-2024 & SoftMCL~\cite{wang2024softmcl} &
+Simple classification was more favorable to LLMs than fine-grained structured tasks. \\
+2024 & SoftMCL\cite{wang2024softmcl} &
 Sentence- and aspect-level sentiment and other affective tasks &
 Uses soft valence and a momentum queue during pretraining &
 Showed benefits across several sentiment tasks. \\
-2025 & Synthetic instructions~\cite{zhao2025instruction} &
+2025 & Synthetic instructions\cite{zhao2025instruction} &
 12 sentiment benchmarks including Amazon, Yelp and IMDb &
-Builds instruction examples without labelled review instances &
+Builds instruction examples without labeled review instances &
 Reported a 5.1-point gain over more complex instruction tuning methods. \\
-2025 & BESSTIE~\cite{srirag2025besstie} &
+2025 & BESSTIE\cite{srirag2025besstie} &
 Google Place and Reddit texts in three English varieties &
 Tests sentiment and sarcasm across varieties &
 Performance fell on Indian English, especially for sarcasm. \\

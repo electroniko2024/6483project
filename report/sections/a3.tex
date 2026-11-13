@@ -1,4 +1,4 @@
-\subsection{(a)(3) Top research groups}
+\subsection{Leading research groups}\label{sec:groups}
 
 Erik Cambria's research group at Nanyang Technological University
 studies how commonsense knowledge can help a system judge the
@@ -9,7 +9,7 @@ to shared concepts. The second extends this approach by examining
 what those concepts mean in a sentence.
 
 \paragraph{SenticNet 7 (2022).}
-Cambria et al.~\citep{cambria2022senticnet} use XLNet to propose
+Cambria et al.\citep{cambria2022senticnet} use XLNet to propose
 words and phrases that could express a similar meaning in context.
 A similarity measure based on links to emotion concepts in ConceptNet
 helps separate expressions that may look alike in context but carry
@@ -23,15 +23,15 @@ datasets, including Amazon reviews and IMDb reviews. They attributed
 part of its performance to wider vocabulary coverage, since missing
 entries were a common source of errors for other lexicons. Sarcasm
 and sentences that express opposing opinions about different targets
-still caused errors. A larger vocabulary helps the system recognise
+still caused errors. A larger vocabulary helps the system recognize
 more expressions, while deciding which opinion applies to which
 target remains a separate problem.
 
 \paragraph{SenticNet 8 (2024).}
 SenticNet 8 combines a commonsense knowledge base with a hierarchical
 attention network that identifies which tokens are most relevant
-to the sentiment decision~\citep{cambria2024senticnet}. Its text
-processing goes from standardising the wording to grouping expressions
+to the sentiment decision\citep{cambria2024senticnet}. Its text
+processing goes from standardizing the wording to grouping expressions
 with similar meanings, then to describing the situation those
 expressions refer to. The paper illustrates this with several ways
 of describing a phone purchase. Phrases such as ``buy a phone'' and
@@ -45,7 +45,7 @@ paper. The test texts were tweets, so applying the method to product
 reviews would require a separate evaluation.
 
 \paragraph{Relevance to product reviews.}
-Review 1123 in part (f) illustrates the issue of opinion targets.
+Review 1123 in Section~\ref{sec:analysis} illustrates the issue of opinion targets.
 The reviewer describes old plastic luggage tags cracking and
 breaking, then explains why the new leather tag was a better
 purchase. The initial RoBERTa ensemble predicted a negative label,

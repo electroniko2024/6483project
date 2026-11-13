@@ -1,7 +1,7 @@
 The feature format decides two things: what information reaches the classifier (word identity only, word similarity, or word meaning in context), and how much computation and memory are needed to obtain it.
 We first compare the three formats in general terms (Table~\ref{tab:g-qual}), then report what we measured on this dataset (Table~\ref{tab:g-measured}), and finally isolate the effect of feature dimensionality inside the TF-IDF line (Table~\ref{tab:g-dims}).
 
-\begin{table}[t]
+\begin{table}[tbp]
 \centering
 \caption{Comparison of the three feature formats used in this project.}
 \label{tab:g-qual}
@@ -23,39 +23,39 @@ Data needed & Moderate; benefits from more data & Less, thanks to pre-trained ve
 \end{tabularx}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[tbp]
 \centering
 \caption{Measured accuracy and resource use on the shared validation split (1{,}492 reviews, 218 negative). Training time is per run (per seed for neural models) and excludes loading data and pre-trained weights. TF-IDF runs are deterministic. Neural models average the probabilities of seeds 42/43/44. The RoBERTa row uses the three runs trained with 10\% warmup and
 linear decay. Its training time is the mean across the three runs,
 and its peak GPU memory is the maximum across them. Hardware differs by line: TF-IDF on an AMD laptop CPU (16 threads), GloVe models on a 9-thread x86-64 CPU, RoBERTa on an NVIDIA RTX 3070 Ti Laptop GPU.}
 \label{tab:g-measured}
-\small
-\resizebox{\textwidth}{!}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{l r r r r r r r}
 \toprule
 Model & Feature dim & Params & Acc@0.5 & Acc@$\tau_{acc}$ & Macro-F1@$\tau_{f1}$ & Train (s) & Peak mem (MiB) \\
 \midrule
 TF-IDF + LR            & 50{,}000 & 50{,}001  & 0.924 & 0.928 & 0.851 & 1.5 & 122 \\
-TF-IDF + LinearSVC     & 50{,}000 & 150{,}009$^{\dagger}$ & 0.929 & 0.930 & 0.857 & 2.8 & 150 \\
+TF-IDF + SVM     & 50{,}000 & 150{,}009$^{\dagger}$ & 0.929 & 0.930 & 0.857 & 2.8 & 150 \\
 TF-IDF + ComplementNB  & 10{,}000 & 20{,}000  & 0.910 & 0.926 & 0.857 & 1.2 & 155 \\
 Mean GloVe + LR & 300 & 301 & 0.854 & 0.899 & 0.788 & 0.06 & 351 \\
 GloVe + BiLSTM & 300/token & 2{,}876{,}010 & 0.930 & 0.930 & 0.852 & 121.6 & 1{,}112 \\
 RoBERTa-base & 768/token & 124{,}647{,}170 & 0.959 & 0.962 & 0.927 & 113.1 & 2{,}434$^{\S}$ \\
 \bottomrule
-\end{tabular}}\\[2pt]
+\end{tabular}\\[2pt]
 \footnotesize $^{\dagger}$Three calibrated SVMs, one per internal calibration fold, each with its own weight vector.
-$^{\S}$Peak GPU memory (\texttt{torch.cuda.max\_memory\_allocated}); the other rows report CPU process memory.
+$^{\S}$Peak GPU memory; the other rows report CPU process memory.
 \end{table}
 
-\begin{table}[t]
+\begin{table}[tbp]
 \centering
 \caption{Effect of TF-IDF dimensionality, with the classifier fixed (LR, $C{=}10$, balanced class weights), trained on the training part and evaluated on the validation split.}
 \label{tab:g-dims}
-\small
-\resizebox{\textwidth}{!}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{l r r r r r r}
 \toprule
-Features & Dim & Non-zeros / review & Matrix (MB) & Vectorise + fit (s) & Macro-F1@0.5 & AUC \\
+Features & Dim & Non-zeros / review & Matrix (MB) & Vectorize + fit (s) & Macro-F1@0.5 & AUC \\
 \midrule
 Word 1--2-grams, top 1k   & 1{,}000   & 45  & 3.1  & 1.2 & 0.811 & 0.930 \\
 Word 1--2-grams, top 5k   & 5{,}000   & 63  & 4.3  & 1.2 & 0.840 & 0.946 \\
@@ -65,7 +65,7 @@ Word 1--2-grams, top 50k  & 50{,}000  & 86  & 5.8  & 1.3 & 0.845 & 0.950 \\
 Word 1--2-grams, all      & 123{,}515 & 98  & 6.7  & 1.2 & 0.846 & 0.951 \\
 \quad + char 2--5-grams (all) & 174{,}735 & 649 & 43.9 & 6.3 & 0.858 & 0.952 \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \paragraph{Dimensionality within one format.}
@@ -78,22 +78,22 @@ A difference of 0.01 Macro-F1 is within the noise of a split with only 218 negat
 
 \paragraph{Across formats: accuracy.}
 The three formats differ in how much linguistic structure they expose.
-TF-IDF already reaches 92.8--93.0\% accuracy, because most reviews contain strong, explicit opinion words.
+TF-IDF already reaches 0.928--0.930 accuracy, because most reviews contain strong, explicit opinion words.
 The largest LR weights are intuitive: ``disappointed'', ``uncomfortable'', ``returned'' and ``poor'' for negative reviews, ``great'', ``comfortable'', ``perfect'' and ``love'' for positive ones.
 However, the unigram ``not'' alone receives the most negative weight. As a result, ``not bad'' gets only a small positive bigram weight (+0.59), which barely offsets the strongly negative ``not'' and ``bad'', while ``not worth'' (-3.31) is captured correctly.
 This is exactly where order-aware and contextual features should help: negation, contrast (``but the\dots'' is among the top negative features) and implicit sentiment.
 The measured results in Table~\ref{tab:g-measured} confirm this.
 At the validation-selected threshold of 0.590, the RoBERTa
-ensemble reached 96.25\% accuracy and 92.73\% Macro-F1, compared
-with 93.0\% accuracy and 85.71\% Macro-F1 for TF-IDF + LinearSVC
+ensemble reached 0.962 accuracy and 0.927 Macro-F1, compared
+with 0.930 accuracy and 0.857 Macro-F1 for TF-IDF + SVM
 at its respective tuned thresholds. ROC-AUC was 0.981 for RoBERTa
-and 0.950 for LinearSVC. The three individual RoBERTa runs had a
-population standard deviation of 0.43 percentage points in
+and 0.950 for the SVM. The three individual RoBERTa runs had a
+population standard deviation of 0.004 in
 Macro-F1 at a threshold of 0.5.
 The BiLSTM, by contrast, only matches TF-IDF: its three-seed average reaches 0.852 (single runs 0.838\,$\pm$\,0.005), against 0.851--0.857. With 5.9k training reviews, static embeddings and a recurrent encoder learned from scratch capture no more than the n-gram weights do.
 Averaging GloVe vectors discards both word order and the identity of rare but decisive words, and drops to 0.788.
 RoBERTa achieved the highest validation Macro-F1 among the models
-compared. Part (f) examines examples of errors made by the initial
+compared. Section~\ref{sec:analysis} examines examples of errors made by the initial
 constant-learning-rate RoBERTa model and the TF-IDF baseline.
 
 \paragraph{Across formats: resources.}
@@ -108,7 +108,7 @@ These timings reflect the hardware used for each model.
 Figure~\ref{fig:g-scatter} plots validation Macro-F1 against
 training time on a logarithmic scale.
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=0.62\textwidth]{f1_vs_train_time.png}
 \caption{Validation Macro-F1 at the tuned threshold versus training
@@ -119,8 +119,8 @@ is reported per seed. The RoBERTa point uses the three warmup runs.}
 
 \paragraph{Practical implications.}
 \begin{itemize}
-  \item \textbf{Small labelled data favours pre-trained features.} With only 5.9k training reviews, TF-IDF must learn every n-gram's polarity from scratch, and 24\% of the word types in the validation reviews never occur in training. Pre-trained embeddings, and above all pre-trained language models, bring knowledge learned from billions of words, so they generalise better to rare words, typos and paraphrases.
-  \item \textbf{Large data or tight budgets favour sparse features.} TF-IDF scales linearly, runs on any CPU and is fully interpretable. It is the right choice when latency, cost or explainability matter more than the last percentage point, and it is a strong baseline.
-  \item \textbf{Robustness to domain change differs.} TF-IDF and GloVe fix their vocabulary at training time. A subword model covers any input string, which matters for the hotel-review scenario in (h).
+  \item \textbf{Small labeled data favors pre-trained features.} With only 5.9k training reviews, TF-IDF must learn every n-gram's polarity from scratch, and 24\% of the word types in the validation reviews never occur in training. Pre-trained embeddings, and above all pre-trained language models, bring knowledge learned from billions of words, so they generalize better to rare words, typos and paraphrases.
+  \item \textbf{Large data or tight budgets favor sparse features.} TF-IDF scales linearly, runs on any CPU and is fully interpretable. It is the right choice when latency, cost or explainability matter more than the last percentage point, and it is a strong baseline.
+  \item \textbf{Robustness to domain change differs.} TF-IDF and GloVe fix their vocabulary at training time. A subword model covers any input string, which matters for the hotel-review scenario in Section~\ref{sec:hotel}.
 \end{itemize}
 In short, for this task the feature format moves accuracy by a few points but cost by orders of magnitude. The choice should therefore follow the accuracy target and the available hardware.

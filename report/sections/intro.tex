@@ -1,0 +1,35 @@
+Sentiment analysis determines the polarity of a piece of text, and product reviews are one of its most common applications.
+This report builds and evaluates classifiers that label a product review as negative (0) or positive (1).
+The training set contains 7{,}401 labeled reviews, of which 85.4\% are positive, and the test set contains 1{,}851 unlabeled reviews.
+The task combines a modest amount of training data, a strong class imbalance and noisy, informal text, so the choice of feature format matters for both accuracy and cost.
+
+We make four contributions.
+(1) We define one grouped, stratified validation split in which duplicate review texts never cross the split, and use it for every model, so that all scores are comparable.
+(2) We compare three feature formats of increasing cost under identical conditions: sparse TF-IDF n-grams with linear classifiers, static GloVe embeddings with logistic regression and a BiLSTM, and subword tokens with a fine-tuned RoBERTa-base model.
+(3) We submit the average of three RoBERTa runs, which reaches 0.962 accuracy and 0.927 Macro-F1 on the validation split, and we analyze its predictions on a manually labeled sample of test reviews.
+(4) We discuss how the approach transfers to unlabeled hotel reviews and, with a controlled label-flipping experiment, how noisy ratings degrade it and which of three remedies helps most.
+
+Section~\ref{sec:related} reviews the literature. Sections~\ref{sec:data}--\ref{sec:hparams} describe the data, the models and the parameter settings; Sections~\ref{sec:results}--\ref{sec:formats} report the test-set results, the analysis of predictions and the comparison of feature formats; Sections~\ref{sec:hotel} and~\ref{sec:noise} address the two transfer scenarios, and Section~\ref{sec:conclusion} concludes.
+Table~\ref{tab:intro-map} shows where each question of the assignment is answered, and Appendix~\ref{app:code} explains how to reproduce the results.
+
+\begin{table}[tbp]
+\centering
+\caption{Where each question of the assignment is answered.}
+\label{tab:intro-map}
+\small
+\begin{tabular}{l l l}
+\toprule
+Question & Topic & Section \\
+\midrule
+(a) & Literature survey & \ref{sec:related} (\ref{sec:problem}--\ref{sec:baseline}) \\
+(b) & Feature format and data preprocessing & \ref{sec:data} \\
+(c) & Model, architecture, loss and training & \ref{sec:models} \\
+(d) & How parameters were determined & \ref{sec:hparams} \\
+(e) & Test-set results and \texttt{submission.csv} & \ref{sec:results} \\
+(f) & Correctly and incorrectly classified samples & \ref{sec:analysis} \\
+(g) & Feature format, resources and accuracy & \ref{sec:formats} \\
+(h) & Hotel reviews without rating scores & \ref{sec:hotel} \\
+(i) & Hotel reviews with noisy rating scores & \ref{sec:noise} \\
+\bottomrule
+\end{tabular}
+\end{table}

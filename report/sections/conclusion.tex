@@ -1,0 +1,10 @@
+We compared sparse TF-IDF features, static GloVe embeddings and fine-tuned RoBERTa subword representations on a single, leakage-free validation split.
+A three-seed RoBERTa ensemble performed best, with 0.962 accuracy and 0.927 Macro-F1 at a threshold tuned on validation data, clearly ahead of TF-IDF with a linear SVM (0.930 and 0.857).
+The BiLSTM only matched TF-IDF while needing about 80 times more training time, and averaged GloVe vectors were the weakest (0.788 Macro-F1).
+For this task the feature format therefore changed accuracy by a few points but cost by orders of magnitude.
+Fine-tuning was also sensitive to the random seed: without learning-rate warmup one of three runs collapsed to a constant prediction, and warmup removed the problem.
+
+The conclusions have limits.
+All model selection used one validation split with only 218 negative reviews, so small differences should not be over-interpreted.
+The sample-level analysis in Section~\ref{sec:analysis} examines the initial ensemble, not the final one, and the noise experiment uses synthetic noise and a linear model.
+Natural next steps are to repeat the error analysis for the final ensemble, to evaluate the models on real hotel reviews, and to test noise-robust losses with RoBERTa.

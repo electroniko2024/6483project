@@ -4,7 +4,7 @@ training reviews. The TF-IDF grid covers minimum document frequency, a
 vocabulary cap and optional character features. These control the trade-off
 between coverage of rare expressions and the number of features. Logistic
 regression uses $C=10$ and balanced class weights with 50,000 word unigram and
-bigram features. The calibrated LinearSVC selects $C=1$ without class weights,
+bigram features. The calibrated linear SVM selects $C=1$ without class weights,
 and ComplementNB selects $\alpha=0.1$ with 10,000 features.
 
 \paragraph{Static embedding models.}
@@ -34,7 +34,7 @@ scores. The unlabeled product test set is used for prediction.
 For each model, the accuracy and Macro-F1 thresholds are then fitted separately
 on the validation probabilities.
 
-The sequential sweep ran seven configurations, followed by the three final fits. The selected learning rate is $0.001$, with width 128 per direction, dropout 0.3, trainable embeddings, and ordinary cross-entropy. The single-seed Macro-F1 is $0.8383\pm0.0050$ (mean and population standard deviation). The three-seed probability average reaches 0.8524 Macro-F1 at threshold 0.5. Its validation-selected thresholds are $\tau_{\mathrm{acc}}=0.500$ and $\tau_{\mathrm{F1}}=0.500$. The individual settings and scores are recorded in \texttt{outputs/bilstm/hparam\_log.csv}.
+The sequential sweep ran seven configurations, followed by the three final fits. The selected learning rate is $0.001$, with width 128 per direction, dropout 0.3, trainable embeddings, and ordinary cross-entropy. The single-seed Macro-F1 is $0.8383\pm0.0050$ (mean and population standard deviation). The three-seed probability average reaches 0.8524 Macro-F1 at threshold 0.5. Its validation-selected thresholds are $\tau_{\mathrm{acc}}=0.500$ and $\tau_{\mathrm{F1}}=0.500$. The individual settings and scores are recorded in the project repository (Appendix~\ref{app:code}).
 
 \paragraph{Transformer.}
 We initially fine-tuned RoBERTa-base for one epoch with AdamW, a
@@ -60,3 +60,4 @@ Macro-F1 at the same threshold. We then reran seeds 42 and 43 under the
 same schedule so that all three runs used the same settings. The final
 Macro-F1 scores were 0.920, 0.910, and 0.914 for seeds 42, 43, and 44,
 respectively.
+In the following sections, the \emph{initial ensemble} is the average of the three constant-learning-rate runs and the \emph{final ensemble} is the average of the three warmup runs.

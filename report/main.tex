@@ -18,7 +18,7 @@
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit}
-\usepackage[numbers,sort&compress]{natbib}
+\usepackage[super,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black,filecolor=black]{hyperref}
 
 \graphicspath{{figures/}}
@@ -26,11 +26,12 @@
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 
 \title{EE6483 Artificial Intelligence and Data Mining\\Mini Project (Option 1): Sentiments of Product Reviews}
-\author{Team 110}
+\author{Team 110: MENG XIANGYU, WU DAYU, YIN JIYANG}
 \date{November 2026}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{2em}
 \begin{document}
 \vspace*{-1.8cm}
 {\let\newpage\relax\maketitle}
@@ -44,53 +45,71 @@
 \toprule
 Name & Matric no. & Email & Contribution \\
 \midrule
-MENG XIANGYU & G2607496E & \texttt{\footnotesize meng0106@e.ntu.edu.sg} & Shared code (\texttt{common.py}, data split, evaluation), TF-IDF baselines, noisy-label experiment, resource/accuracy analysis; report (a)(1), (b), (g), (i); report integration. \\
-WU DAYU & G2603624F & \texttt{\footnotesize dayu002@e.ntu.edu.sg} & GloVe features, averaged-GloVe + LR, BiLSTM model and tuning; report (a)(2), (a)(4), (d), (h). \\
-YIN JIYANG & G2605135H & \texttt{\footnotesize jiyang002@e.ntu.edu.sg} & RoBERTa fine-tuning, ensemble and final submission, error analysis; report (a)(3), (c), (e), (f); README. \\
+MENG XIANGYU & G2607496E & \texttt{\footnotesize meng0106@e.ntu.edu.sg} & Shared code (\texttt{common.py}, data split, evaluation), TF-IDF baselines, noisy-label experiment, resource/accuracy analysis; Sections~\ref{sec:problem}, \ref{sec:data}, \ref{sec:formats} and \ref{sec:noise}; report integration. \\
+WU DAYU & G2603624F & \texttt{\footnotesize dayu002@e.ntu.edu.sg} & GloVe features, averaged-GloVe + LR, BiLSTM model and tuning; Sections~\ref{sec:recent}, \ref{sec:baseline}, \ref{sec:hparams} and \ref{sec:hotel}. \\
+YIN JIYANG & G2605135H & \texttt{\footnotesize jiyang002@e.ntu.edu.sg} & RoBERTa fine-tuning, ensemble and final submission, error analysis; Sections~\ref{sec:groups}, \ref{sec:models}, \ref{sec:results} and \ref{sec:analysis}; README. \\
 \bottomrule
 \end{tabularx}
 \end{table}
-All members contributed papers to the literature table in (a)(2) and cross-reviewed each other's sections.
+All members contributed papers to the literature table in Section~\ref{sec:recent} and cross-reviewed each other's sections.
 
-% Compact table of contents so the cover, contribution table and contents fit on page 1.
-{\setlength{\parskip}{0pt}\small\tableofcontents}
-\newpage
+\begin{abstract}
+We study document-level sentiment classification of product reviews (7{,}401 labeled training reviews, 85.4\% positive; 1{,}851 test reviews).
+Using one grouped, stratified validation split that prevents duplicate-text leakage, we compare three feature formats: sparse TF-IDF n-grams with linear classifiers, static GloVe embeddings with logistic regression and a BiLSTM, and subword tokens with a fine-tuned RoBERTa-base model.
+The average of three RoBERTa runs reaches 0.962 accuracy and 0.927 Macro-F1 on validation data, against 0.930 and 0.857 for the best TF-IDF model, while the BiLSTM only matches TF-IDF at about 80 times its training time.
+We also discuss adaptation to unlabeled hotel reviews and, in a controlled experiment with injected label noise, show that Confident-Learning-style filtering is the most reliable of three remedies (ROC-AUC 0.909 versus 0.837 without a remedy at 20\% symmetric noise).
+\end{abstract}
 
-\section{(a) Literature survey}
+\section{Introduction}\label{sec:intro}
+\input{sections/intro}
+
+\section{Related Work}\label{sec:related}
 \input{sections/a1}
 \input{sections/a2}
 \input{sections/a3}
 \input{sections/a4}
 
-\section{(b) Feature format and data preprocessing}
+\section{Data and Feature Representation}\label{sec:data}
 \input{sections/b}
 
-\section{(c) Model}
+\section{Models}\label{sec:models}
 \input{sections/c}
 
-\section{(d) Parameter selection}
+\section{Parameter Selection}\label{sec:hparams}
 \input{sections/d}
 
-\section{(e) Test-set results}
+\section{Test-Set Results}\label{sec:results}
 \input{sections/e}
 
-\section{(f) Analysis of correctly and incorrectly classified samples}
+\section{Analysis of Predictions}\label{sec:analysis}
 \input{sections/f}
 
-\section{(g) Effect of the feature format on resources and accuracy}
+\section{Feature Format, Accuracy and Resources}\label{sec:formats}
 \input{sections/g}
 
-\section{(h) Hotel reviews without rating scores}
+\section{Domain Shift: Hotel Reviews Without Ratings}\label{sec:hotel}
 \input{sections/h}
 
-\section{(i) Hotel reviews with noisy rating scores}
+\section{Noisy Labels: Hotel Reviews With Inaccurate Ratings}\label{sec:noise}
 \input{sections/i}
 
+\section{Conclusion}\label{sec:conclusion}
+\input{sections/conclusion}
+
 \appendix
-\section{Code and instructions}
-The code is in the \texttt{src/} folder. The project
-\texttt{README.md} explains how to run the models and regenerate the
-final predictions from the saved outputs.
+\section{Code and Reproducibility}\label{app:code}
+All code, data splits and outputs are in the submitted archive. The main files are:
+\begin{itemize}
+  \item \texttt{README.md}: installation and the commands that reproduce every result;
+  \item \texttt{src/common.py}: data loading, the shared validation split, metrics, threshold selection and the writer of \texttt{submission.csv};
+  \item \texttt{src/tfidf\_models.py}, \texttt{src/tfidf\_dim\_study.py} and \texttt{src/resource\_table.py}: the TF-IDF models, the dimensionality study and the resource table (Sections~\ref{sec:hparams} and~\ref{sec:formats});
+  \item \texttt{src/noise\_exp.py}: the label-noise experiment (Section~\ref{sec:noise});
+  \item \texttt{src/glove\_bilstm.py}: GloVe features, mean-embedding classifier and BiLSTM;
+  \item \texttt{src/transformer\_ft\_warmup.py}, \texttt{src/transformer\_ft.py} and \texttt{src/ensemble.py}: RoBERTa fine-tuning and the final predictions;
+  \item \texttt{splits/val\_idx.npy}: the shared validation indices;
+  \item \texttt{outputs/<model>/}: validation and test probabilities, metrics and hyper-parameter logs (for example \texttt{outputs/bilstm/hparam\_log.csv}); \texttt{outputs/noise\_exp/summary.csv} holds the full noise-experiment results.
+\end{itemize}
+Random seeds are fixed (42, 43 and 44 for the neural models), so the saved outputs can be regenerated.
 
 \bibliographystyle{unsrtnat}
 \bibliography{refs}
