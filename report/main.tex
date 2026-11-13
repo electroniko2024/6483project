@@ -48,6 +48,8 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2pt plus 1pt}
 \setlength{\emergencystretch}{2em}
+% abstract: left-aligned heading, body set exactly like the main text
+\renewenvironment{abstract}{\section*{\abstractname}}{}
 \begin{document}
 \vspace*{-1.8cm}
 {\let\newpage\relax\maketitle}
