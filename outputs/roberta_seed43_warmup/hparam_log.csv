@@ -1,0 +1,2 @@
+seed,lr,batch_size,max_length,epochs,best_epoch,loss,precision,lr_schedule,val_acc@0.5,val_macro_f1@0.5
+43,2e-05,4,256,1,1,unweighted cross-entropy,fp32,linear_with_10pct_warmup,0.9537533512064343,0.9098831127564049

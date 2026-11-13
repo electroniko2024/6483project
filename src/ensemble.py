@@ -6,8 +6,12 @@ from common import evaluate, load_data, write_submission
 
 
 root = Path(__file__).resolve().parents[1]
-folders = ["roberta", "roberta_seed43", "roberta_seed44"]
-threshold = 0.680
+folders = [
+    "roberta_seed42_warmup",
+    "roberta_seed43_warmup",
+    "roberta_seed44_warmup",
+]
+threshold = 0.590
 
 
 def read_predictions(filename):
