@@ -1,17 +1,20 @@
 \paragraph{Test sample and annotation.}
-After excluding 101 test reviews whose text also appeared in the
-training set, we selected 40 reviews for manual annotation. Fifteen
-had RoBERTa probabilities closest to the decision threshold. Another
-15 were drawn from reviews on which RoBERTa and TF-IDF + SVM disagreed.
-The last 10 were drawn at random from the remaining reviews. Two
-members labelled all 40 independently and agreed on 38 (95\%).
+The error analysis in this section uses the initial RoBERTa ensemble,
+trained with a constant learning rate and evaluated at a threshold of
+0.680. After excluding 101 test reviews whose text also appeared in
+the training set, we selected 40 reviews for manual annotation.
+Fifteen were closest to the initial RoBERTa decision threshold,
+15 were drawn from reviews on which that ensemble and TF-IDF + SVM
+disagreed, and 10 were drawn at random from the remaining reviews.
+Two members labelled all 40 independently and agreed on 38 (95\%).
 A third member resolved the two disagreements.
 
 \paragraph{Correct and incorrect predictions.}
 RoBERTa matched the final human labels on 31 of the 40 sampled reviews
 (77.5\%). The sample deliberately included reviews near the decision
 threshold and reviews on which the models disagreed, so this accuracy
-applies only to the selected reviews.
+applies only to the selected reviews. On the same 40 reviews, the final RoBERTa ensemble described in
+part (e) matched 34 human labels (85.0\%).
 
 RoBERTa correctly classified reviews 274 and 99. In review 274, the
 reviewer points out a limitation of the garment and still recommends

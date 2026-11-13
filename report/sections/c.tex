@@ -134,10 +134,12 @@ at the first token, \texttt{\textless s\textgreater}.}
 
 \paragraph{Fine-tuning.}
 The encoder and classification head were fine-tuned together on the
-5,909 training reviews from the shared split. Each run lasted one
-epoch in FP32 with a batch size of 4. AdamW used a fixed learning
-rate of \(2 \times 10^{-5}\) and a weight decay of 0.01. The loss
-was unweighted cross-entropy.
+5,909 training reviews from the shared split. Each of the three final
+runs used one epoch, FP32 precision, a batch size of 4, and unweighted
+cross-entropy. AdamW used a weight decay of 0.01. The learning rate
+increased to \(2 \times 10^{-5}\) over the first 10\% of training
+steps and then decayed linearly to zero. Part (d) describes how
+we selected this schedule.
 
 \paragraph{Prediction.}
 The data split and training settings were fixed across the three

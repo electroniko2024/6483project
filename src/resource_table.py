@@ -34,9 +34,18 @@ COLS = ["name", "model", "feature", "feature_dim", "sparse", "n_params",
 def main():
     rows = []
     folders = sorted(f.parent for f in OUTPUT_DIR.glob("*/metrics.json"))
-    seed_runs = {}  # base name -> [folders]; C stores seeds as X, X_seed43, X_seed44
+    warmup_names = {f"roberta_seed{seed}_warmup" for seed in (42, 43, 44)}
+    warmup_found = warmup_names.intersection(d.name for d in folders)
+    if warmup_found and warmup_found != warmup_names:
+        raise ValueError("All three RoBERTa warmup runs are required.")
+    
+    seed_runs = {}
     for d in folders:
         base = re.sub(r"_seed\d+$", "", d.name)
+        if d.name in warmup_names:
+            base = "roberta"
+        elif base == "roberta" and warmup_found:
+            continue
         seed_runs.setdefault(base, []).append(d)
     for base, ds in seed_runs.items():
         if len(ds) == 1:

@@ -1,20 +1,21 @@
 \paragraph{Final model.}
-We averaged the positive-class probabilities from three RoBERTa-base
-runs with random seeds 42, 43, and 44. A weighted combination of
-RoBERTa (75\%) and TF-IDF + SVM (25\%) raised validation macro-F1
-from 90.82\% to 91.63\%. The gain of 0.81 percentage points was
-smaller than the standard deviation of 20.27 percentage points
-across the three individual RoBERTa runs at a threshold of 0.500.
-Under our model selection rule, we used the averaged RoBERTa
-probabilities for the final submission.
+We averaged the positive-class probabilities from the three
+RoBERTa-base runs trained with 10\% warmup and linear decay. At a
+threshold of 0.5, the population standard deviation of single-run
+Macro-F1 decreased from 20.27 percentage points under the original
+schedule to 0.43 percentage points across the same three seeds. On the
+validation set, the final RoBERTa ensemble achieved 92.73\% Macro-F1
+after threshold selection. The 75\% RoBERTa and 25\% TF-IDF + SVM
+blend achieved 92.57\% after its own threshold selection, so we used
+the RoBERTa ensemble for submission.
 
 \paragraph{Decision threshold.}
-Among the thresholds evaluated on the 1,492 labeled validation
-reviews, 0.680 gave the highest accuracy (95.38\%) and macro-F1
-(90.82\%) for the averaged RoBERTa probabilities. We applied the
-same threshold to the test set. Reviews with an average
-positive-class probability of at least 0.680 received label 1
-(positive). The remaining reviews received label 0 (negative).
+On the 1,492 labelled validation reviews, a threshold of 0.590 gave
+the highest accuracy (96.25\%) and Macro-F1 (92.73\%) among the
+thresholds evaluated for the RoBERTa ensemble. We applied the same
+threshold to the test set, assigning label 1 to reviews with an
+average positive-class probability of at least 0.590 and label 0
+to the remaining reviews.
 
 \paragraph{Test predictions.}
 The table shows the predicted label distribution for the 1,851
@@ -25,8 +26,8 @@ unlabeled test reviews.
 \hline
 Predicted label & Number of reviews & Share \\
 \hline
-Positive (1)    & 1,578             & 85.25\% \\
-Negative (0)    &   273             & 14.75\% \\
+Positive (1)    & 1,568             & 84.71\% \\
+Negative (0)    &   283             & 15.29\% \\
 \hline
 Total           & 1,851             & 100.00\% \\
 \hline

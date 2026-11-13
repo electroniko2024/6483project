@@ -1,6 +1,6 @@
 | Model | Feature dim | Sparse | Params | Val Acc@0.5 | Val Macro-F1@0.5 | AUC | Acc@thr_acc | Macro-F1@thr_f1 | Seed std | Train s | Infer s | Peak MB | OOV | Hardware |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| roberta (avg of 3 seeds) | 768 | – | 124647170 | 0.9457 | 0.8813 | 0.9801 | 0.9538 | 0.9082 | 0.2027 | 114.8 | 7.950 | 2434 | – | CPU: AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD (16 threads); GPU: NVIDIA GeForce RTX 3070 Ti Laptop GPU |
+| roberta (avg of 3 seeds) | 768 | – | 124647170 | 0.9591 | 0.9194 | 0.9806 | 0.9625 | 0.9273 | 0.0043 | 113.1 | 7.715 | 2434 | – | CPU: AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD (16 threads); GPU: NVIDIA GeForce RTX 3070 Ti Laptop GPU |
 | tfidf_svm | 50000 | True | 150009 | 0.9290 | 0.8476 | 0.9502 | 0.9296 | 0.8571 | 0.0000 | 2.8 | 0.004 | 150 | – | CPU: AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD (16 threads) |
 | tfidf_cnb | 10000 | True | 20000 | 0.9102 | 0.8385 | 0.9529 | 0.9263 | 0.8571 | 0.0000 | 1.2 | 0.004 | 155 | – | CPU: AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD (16 threads) |
 | bilstm | 300 | False | 2876010 | 0.9303 | 0.8524 | 0.9470 | 0.9303 | 0.8524 | 0.0050 | 121.6 | 4.574 | 1112 | 0.050 | CPU: x86_64 (9 threads) |

@@ -38,9 +38,26 @@ on the validation probabilities.
 The sequential sweep ran seven configurations, followed by the three final fits. The selected learning rate is $0.001$, with width 128 per direction, dropout 0.3, trainable embeddings, and ordinary cross-entropy. The single-seed Macro-F1 is $0.8383\pm0.0050$ (mean and population standard deviation). The three-seed probability average reaches 0.8524 Macro-F1 at threshold 0.5. Its validation-selected thresholds are $\tau_{\mathrm{acc}}=0.500$ and $\tau_{\mathrm{F1}}=0.500$. The individual settings and scores are recorded in \texttt{outputs/bilstm/hparam\_log.csv}.
 
 \paragraph{Transformer.}
-RoBERTa-base was fine-tuned with AdamW (learning rate $2\times10^{-5}$, weight decay 0.01), unweighted cross-entropy, batch size 4, maximum length 256 and a single epoch, in fp32 with a constant learning rate.
-The small learning rate is the usual choice for fine-tuning a pre-trained encoder: larger steps overwrite the pre-trained representation, while one epoch was enough to reach about 95\% validation accuracy on 5.9k reviews.
-The batch size of 4 was set by the memory of the laptop GPU.
-Because of the deadline, no learning-rate or loss-weighting search was run for this model; class imbalance is handled by tuning the decision threshold on the validation split instead.
-Seeds 42 and 43 reached validation Macro-F1@0.5 of 0.897 and 0.884. The seed-44 run diverged to a constant prediction (Macro-F1 0.461), a known failure mode of fine-tuning without learning-rate warm-up; a linear warm-up would be the first change to make.
-\tbd{C: update if seed 44 is re-run with warm-up.}
+We initially fine-tuned RoBERTa-base for one epoch with AdamW, a
+constant learning rate of $2\times10^{-5}$, and weight decay of 0.01.
+We used unweighted cross-entropy, a batch size of 4, a maximum sequence
+length of 256 tokens, and FP32 precision. At a threshold of 0.5, seeds
+42 and 43 reached validation Macro-F1 scores of 0.897 and 0.884,
+respectively. Seed 44 scored 0.461 and classified every validation
+review as positive.
+
+Repeating seed 44 under the original settings reproduced the same
+Macro-F1 score. Extending training to two epochs at the same constant
+learning rate also left Macro-F1 at 0.461 at the end of the second
+epoch. This variation across seeds suggested that the original
+fine-tuning setup was sensitive to randomness. The seed affects both
+classification-head initialization and the order of training examples,
+so our runs could not isolate their individual effects.
+
+We returned to one epoch and changed the learning-rate schedule. The
+learning rate rose to $2\times10^{-5}$ over the first 10\% of training
+steps and then decayed linearly to zero. Seed 44 improved to 0.914
+Macro-F1 at the same threshold. We then reran seeds 42 and 43 under the
+same schedule so that all three runs used the same settings. The final
+Macro-F1 scores were 0.920, 0.910, and 0.914 for seeds 42, 43, and 44,
+respectively.
