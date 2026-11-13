@@ -31,3 +31,12 @@ report/report.fls
 report/report.fdb_latexmk
 report/report.xdv
 report/main.pdf
+report/zh/*.aux
+report/zh/*.log
+report/zh/*.out
+report/zh/*.toc
+report/zh/*.bbl
+report/zh/*.blg
+report/zh/*.fls
+report/zh/*.fdb_latexmk
+report/zh/*.xdv
