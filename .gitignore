@@ -40,3 +40,14 @@ report/zh/*.blg
 report/zh/*.fls
 report/zh/*.fdb_latexmk
 report/zh/*.xdv
+report/zh/report_zh.aux
+report/zh/report_zh.log
+report/zh/report_zh.out
+report/zh/report_zh.toc
+report/zh/report_zh.bbl
+report/zh/report_zh.blg
+report/zh/report_zh.fls
+report/zh/report_zh.fdb_latexmk
+report/zh/report_zh.xdv
+report/zh/main_zh.pdf
+code_submission.zip
