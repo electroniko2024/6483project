@@ -1,2 +1,147 @@
-% Owner: member C. Placeholder created by A; replace with the section text.
-\tbd{member C}
+\subsection{TF-IDF classifiers}
+
+The three TF-IDF classifiers take the sparse n-gram vectors described
+in part (b). Logistic regression maps a weighted sum of the features
+to a positive-class probability. The linear SVM produces a margin score,
+which is converted to a probability by sigmoid calibration on grouped
+folds within the training split. Complement Naive Bayes estimates
+each class's feature weights from reviews in the other class, with
+additive smoothing.
+
+The feature and classifier settings were selected by grouped five-fold
+cross-validation within the training portion. Each selected model was
+then fitted on 5,909 reviews and evaluated on the shared validation
+set of 1,492 reviews. For test prediction, both the TF-IDF vectoriser
+and the classifier were refitted on all 7,401 labelled reviews.
+
+\subsection{GloVe embeddings and BiLSTM}
+
+The mean-embedding classifier averages the GloVe vectors available for
+the tokens in a review. If none of the tokens has a pre-trained vector,
+the review is represented by a zero vector. The resulting 300 features
+feed a regularised logistic regression classifier.
+
+The BiLSTM uses the same training vocabulary to initialise an
+embedding matrix of size $V \times 300$, where $V$ is the vocabulary
+size. Entries without pre-trained vectors are initialised from a
+zero-mean Gaussian with standard deviation 0.05, and the padding row
+is fixed at zero. The input is a batch of integer token IDs of shape
+$B \times L$, where $B$ is the batch size and $L \leq 256$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=3mm,
+  modelblock/.style={
+    draw, rounded corners, align=center,
+    text width=.69\linewidth, inner sep=5pt
+  }
+]
+\node[modelblock] (tokens) {Token IDs $[B,L]$};
+\node[modelblock, below=of tokens] (embed)
+  {GloVe-initialised embedding $[B,L,300]$};
+\node[modelblock, below=of embed] (recur)
+  {Two bidirectional LSTM layers $[B,L,2H]$};
+\node[modelblock, below=of recur] (pool)
+  {Masked max and mean pooling, concatenated $[B,4H]$};
+\node[modelblock, below=of pool] (out)
+  {Dropout and linear classifier $[B,2]$};
+
+\draw[-{Latex}] (tokens) -- (embed);
+\draw[-{Latex}] (embed) -- (recur);
+\draw[-{Latex}] (recur) -- (pool);
+\draw[-{Latex}] (pool) -- (out);
+\end{tikzpicture}
+\caption{GloVe-initialised BiLSTM. $H$ denotes the hidden width
+per direction.}
+\label{fig:bilstm}
+\end{figure}
+
+In each layer, the backward direction reverses only the valid part of
+the sequence. Both pooling operations ignore padding. Max pooling
+keeps the strongest activation in each channel, while mean pooling
+summarises the valid states. The two pooled vectors are concatenated
+to give the classifier $4H$ features, or 512 when $H=128$.
+
+The BiLSTM was trained with Adam and cross-entropy. In the weighted
+variant, class $j$ receives a loss weight of $n/(2n_j)$, where $n$ is
+the number of training reviews and $n_j$ is the number in that class.
+The best epoch was selected by validation Macro-F1 at a threshold of
+0.5. Softmax gives the positive-class probability, and the validation
+and test probabilities were averaged across seeds 42, 43, and 44.
+
+\subsection{RoBERTa-base}
+
+\paragraph{Input and classifier.}
+After the light cleaning described in part (b), each review retains its
+original casing. The RoBERTa tokenizer splits the text into subwords
+and limits the sequence to 256 tokens, including the special tokens.
+Longer sequences are truncated at the end. Within each batch, shorter
+sequences are padded to match the longest one, and an attention mask
+distinguishes the input tokens from padding.
+
+The encoder produces a 768-dimensional representation at each token
+position. The classification head reads the representation at the
+first token, \texttt{\textless s\textgreater}. A dense layer with
+\texttt{tanh} activation transforms this vector, with dropout before
+and after the layer during training. The final linear layer gives
+one score per class. Softmax converts the two scores to probabilities,
+and the positive-class probability is retained for prediction.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=6mm,
+  box/.style={
+    draw, rounded corners=2pt, align=center, font=\footnotesize,
+    minimum height=21mm, inner xsep=2mm, fill=gray!8
+  },
+  model/.style={box, fill=blue!6},
+  arr/.style={-{Stealth[length=2mm]}, thick}
+]
+\node[box, text width=25mm] (input) {
+  \textbf{Tokenised reviews}\\
+  Token IDs and mask\\
+  $B \times L$
+};
+\node[model, text width=30mm, right=of input] (encoder) {
+  \textbf{RoBERTa-base}\\
+  Contextual vectors\\
+  $B \times L \times 768$
+};
+\node[model, text width=47mm, right=of encoder] (head) {
+  \textbf{Classification head}\\
+  First-token vector: $B \times 768$\\
+  Dropout $\to$ Dense + \texttt{tanh}\\
+  Dropout $\to$ Linear ($768 \to 2$)
+};
+\node[box, text width=24mm, right=of head] (output) {
+  \textbf{Softmax}\\
+  Positive-class\\
+  probability
+};
+
+\draw[arr] (input) -- (encoder);
+\draw[arr] (encoder) -- (head);
+\draw[arr] (head) -- (output);
+\end{tikzpicture}
+\caption{RoBERTa-base architecture for review classification.
+$B$ is the batch size and $L \leq 256$ is the sequence length
+after padding within the batch. The head uses the encoder output
+at the first token, \texttt{\textless s\textgreater}.}
+\label{fig:c-roberta}
+\end{figure}
+
+\paragraph{Fine-tuning.}
+The encoder and classification head were fine-tuned together on the
+5,909 training reviews from the shared split. Each run lasted one
+epoch in FP32 with a batch size of 4. AdamW used a fixed learning
+rate of \(2 \times 10^{-5}\) and a weight decay of 0.01. The loss
+was unweighted cross-entropy.
+
+\paragraph{Prediction.}
+The data split and training settings were fixed across the three
+runs, with random seeds 42, 43, and 44. For each review, the three
+positive-class probabilities were averaged before applying the
+decision threshold. Part (e) explains how the threshold was chosen
+on the validation set and reports the resulting test predictions.

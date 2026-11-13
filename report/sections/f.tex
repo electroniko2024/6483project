@@ -1,2 +1,19 @@
-% Owner: member C. Placeholder created by A; replace with the section text.
-\tbd{member C}
+\paragraph{Correct and incorrect predictions.}
+RoBERTa matched the final human labels on 31 of the 40 sampled reviews
+(77.5\%). The sample deliberately included reviews near the decision
+threshold and reviews on which the models disagreed, so this accuracy
+applies only to the selected reviews.
+
+RoBERTa correctly classified reviews 274 and 99. In review 274, the
+reviewer points out a limitation of the garment and still recommends
+it for smoothing under clothes. That recommendation supports the
+positive label. In review 99, the reviewer initially liked the bra's
+shape and support, but the underwire eventually broke through. This
+failure supports the negative label despite the initial praise.
+
+RoBERTa classified review 549 as positive even though the reviewer
+reported a broken boot strap and asked about returning the boots.
+It classified review 1123 as negative. In that review, the cracking
+and breaking described by the reviewer concerned the old plastic
+luggage tags. The reviewer was satisfied with the new leather tag,
+which was the product being evaluated.
