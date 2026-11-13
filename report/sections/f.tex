@@ -1,3 +1,12 @@
+\paragraph{Test sample and annotation.}
+After excluding 101 test reviews whose text also appeared in the
+training set, we selected 40 reviews for manual annotation. Fifteen
+had RoBERTa probabilities closest to the decision threshold. Another
+15 were drawn from reviews on which RoBERTa and TF-IDF + SVM disagreed.
+The last 10 were drawn at random from the remaining reviews. Two
+members labelled all 40 independently and agreed on 38 (95\%).
+A third member resolved the two disagreements.
+
 \paragraph{Correct and incorrect predictions.}
 RoBERTa matched the final human labels on 31 of the 40 sampled reviews
 (77.5\%). The sample deliberately included reviews near the decision
@@ -17,3 +26,13 @@ It classified review 1123 as negative. In that review, the cracking
 and breaking described by the reviewer concerned the old plastic
 luggage tags. The reviewer was satisfied with the new leather tag,
 which was the product being evaluated.
+
+\paragraph{Validation-set errors.}
+On the shared validation set of 1,492 reviews, TF-IDF + SVM,
+BiLSTM and RoBERTa misclassified 109, 104 and 69 reviews,
+respectively. Of the 30 reviews that all three models
+misclassified, 12 contained mixed sentiment. RoBERTa correctly
+classified 66 reviews that SVM missed, including nine cases
+categorised as involving context or negation. For example, in
+validation review 523, the phrase ``not disappointed'' expresses
+approval, and the reviewer ends with a recommendation.

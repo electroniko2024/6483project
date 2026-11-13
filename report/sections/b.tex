@@ -89,13 +89,16 @@ For the averaged-embedding classifier, a review is the mean of its token vectors
 For the BiLSTM, a review is a sequence of token ids truncated to 256 tokens and padded only to the longest review in each mini-batch.
 
 \paragraph{4c. Subword tokens for a pre-trained Transformer (L3).}
-\tbd{C: please check and adjust this paragraph.}
-Reviews keep their original casing and are tokenised with RoBERTa's byte-level BPE tokenizer, which has a vocabulary of 50{,}265 subwords. Every string can be encoded, so there are no out-of-vocabulary words.
-The sequence is wrapped in \texttt{<s>}\,\dots\,\texttt{</s>} and truncated to 256 subword tokens, keeping the beginning of the review; this affects only about 3\% of reviews.
-Mini-batches are padded dynamically, and an attention mask marks the real tokens.
-The model learns the features itself: each token receives a 768-dimensional contextual vector, and the \texttt{<s>} vector feeds the classifier (see (c)).
+After cleaning, reviews retain their original casing. RoBERTa's
+byte-level BPE tokenizer converts the text to token IDs and adds the
+\texttt{<s>} and \texttt{</s>} tokens. The 256-token limit includes
+these special tokens. When a review is too long, the tokenizer keeps
+the beginning of the text. Each batch is padded to the length of its
+longest sequence, and the attention mask distinguishes input tokens
+from padding. Part (c) describes how the model uses the first token's
+representation for classification.
 
 \paragraph{5. Labels and class imbalance.}
 Labels are used as given (0 = negative, 1 = positive).
 Each model outputs $P(y{=}1\mid x)$. We report metrics at threshold~0.5 and at thresholds tuned on the validation split: one maximising accuracy (\texttt{thr\_acc}, used for the submission) and one maximising Macro-F1 (\texttt{thr\_f1}).
-Class-weighted losses were tried as a hyper-parameter in every model line, as described in (d).
+The RoBERTa runs used unweighted cross-entropy. Part (d) describes the parameter settings evaluated for the other models.
